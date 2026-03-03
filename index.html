@@ -4,7 +4,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>競馬馬券自動購入アプリ</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background: #28a745;
+        }
+        .btn-secondary:hover {
+            background: #218838;
+        }
+        #oddsResult {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        #outputSection {
+            margin-top: 30px;
+        }
+        .portfolio-info {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #28a745;
+        }
+        .portfolio-info p {
+            margin: 5px 0;
+            color: #155724;
+        }
+        .copy-button {
+            background: #007bff;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .copy-button:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -14,18 +158,14 @@
             <h2>ステップ1: レース情報を入力</h2>
             
             <div class="form-group">
-                <label for="raceDate">開催日付 (YYYY-MM-DD):</label>
-                <input type="text" id="raceDate" placeholder="2026-03-03" value="2026-03-03">
+                <label for="raceDate">開催日付:</label>
+                <input type="text" id="raceDate" value="2026-03-03">
             </div>
             
             <div class="form-group">
                 <label for="racePlace">開催地:</label>
                 <select id="racePlace">
                     <option value="">選択してください</option>
-                    <option value="01">札幌</option>
-                    <option value="02">函館</option>
-                    <option value="03">福島</option>
-                    <option value="04">新潟</option>
                     <option value="05">東京</option>
                     <option value="06">中山</option>
                     <option value="07">中京</option>
@@ -36,26 +176,277 @@
             </div>
             
             <div class="form-group">
-                <label for="raceNumber">レース番号 (1-12):</label>
-                <input type="number" id="raceNumber" min="1" max="12" placeholder="1" value="1">
+                <label for="raceNumber">レース番号:</label>
+                <input type="number" id="raceNumber" value="1">
             </div>
             
-            <button id="fetchOdds" class="btn-primary">オッズを取得</button>
-        </div>
-
-        <div class="output-section" id="outputSection" style="display: none;">
-            <h2>ステップ2: オッズ分析結果</h2>
-            <div id="oddsResult"></div>
-            <button id="goToUmaca" class="btn-secondary">ウマカスマートへ</button>
-        </div>
-
-        <div id="loading" class="loading" style="display: none;">
-            読み込み中...
+            <button id="fetchOdds">オッズを取得</button>
         </div>
 
         <div id="error" class="error" style="display: none;"></div>
+
+        <div id="outputSection" style="display: none;">
+            <h2>ステップ2: オッズ分析結果</h2>
+            <div id="oddsResult"></div>
+            
+            <div id="portfolioData" style="display: none;">
+                <h3>📋 投票内容</h3>
+                <div id="portfolioInfo"></div>
+                <button id="goToUmaca" class="btn-secondary">ウマカスマートへ</button>
+            </div>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        console.log('✅ スクリプト開始');
+
+        // グローバル変数
+        let cachedPortfolio = null;
+
+        document.getElementById('fetchOdds').addEventListener('click', function() {
+            console.log('🔵 ボタンクリック');
+            
+            const raceDate = document.getElementById('raceDate').value;
+            const racePlace = document.getElementById('racePlace').value;
+            const raceNumber = document.getElementById('raceNumber').value;
+
+            console.log('入力値:', raceDate, racePlace, raceNumber);
+
+            if (!raceDate || !racePlace || !raceNumber) {
+                showError('すべての項目を入力してください');
+                return;
+            }
+
+            hideError();
+
+            // ダミーオッズ
+            const odds = [
+                { 馬番: 1, オッズ: 2.1, 馬名: 'サンプル馬①' },
+                { 馬番: 2, オッズ: 3.5, 馬名: 'サンプル馬②' },
+                { 馬番: 3, オッズ: 4.2, 馬名: 'サンプル馬③' },
+                { 馬番: 4, オッズ: 8.5, 馬名: 'サンプル馬④' },
+                { 馬番: 5, オッズ: 12.0, 馬名: 'サンプル馬⑤' },
+                { 馬番: 6, オッズ: 18.5, 馬名: 'サンプル馬⑥' },
+                { 馬番: 7, オッズ: 25.0, 馬名: 'サンプル馬⑦' },
+                { 馬番: 8, オッズ: 32.0, 馬名: 'サンプル馬⑧' },
+            ];
+
+            console.log('オッズ:', odds);
+
+            // 割れ目計算
+            const top3 = odds.slice(0, 3);
+            const bottom3 = odds.slice(-3);
+            const topAvg = top3.reduce((sum, o) => sum + o.オッズ, 0) / 3;
+            const bottomAvg = bottom3.reduce((sum, o) => sum + o.オッズ, 0) / 3;
+            const spread = bottomAvg / topAvg;
+
+            console.log('割れ目:', spread.toFixed(2));
+
+            // ポートフォリオを計算
+            const portfolio = calculatePortfolio(odds, raceDate, racePlace, raceNumber);
+            cachedPortfolio = portfolio;
+
+            console.log('ポートフォリオ:', portfolio);
+
+            // 表示
+            let html = '<h3>📊 オッズ一覧</h3>';
+            html += '<table>';
+            html += '<tr><th>馬番</th><th>馬名</th><th>オッズ</th></tr>';
+            odds.forEach(o => {
+                html += `<tr><td>${o.馬番}</td><td>${o.馬名}</td><td>${o.オッズ.toFixed(2)}</td></tr>`;
+            });
+            html += '</table>';
+
+            if (spread >= 2.0) {
+                html += '<h3 style="color:green;">✅ 割れ目検出！購入推奨</h3>';
+                html += `<p><strong>割れ目指数: ${spread.toFixed(2)}倍</strong></p>`;
+                
+                html += '<h3>推奨購入内容</h3>';
+                html += '<table>';
+                html += '<tr><th>馬番</th><th>馬名</th><th>オッズ</th><th>賭金</th></tr>';
+                portfolio.推奨購入.forEach(p => {
+                    html += `<tr><td>${p.馬番}</td><td>${p.馬名}</td><td>${p.オッズ.toFixed(2)}</td><td>${p.賭金}円</td></tr>`;
+                });
+                html += '</table>';
+                html += `<p><strong>総投資: ${portfolio.総投資}円</strong></p>`;
+                html += `<p><strong>期待リターン: ${portfolio.期待リターン}円</strong></p>`;
+            } else {
+                html += '<h3 style="color:red;">❌ 割れ目なし</h3>';
+                html += `<p>割れ目指数: ${spread.toFixed(2)}倍（目安: 2.0倍以上）</p>`;
+            }
+
+            document.getElementById('oddsResult').innerHTML = html;
+
+            // ポートフォリオ情報を表示
+            if (portfolio.割れ目あり) {
+                displayPortfolioInfo(portfolio);
+                document.getElementById('portfolioData').style.display = 'block';
+            } else {
+                document.getElementById('portfolioData').style.display = 'none';
+            }
+
+            document.getElementById('outputSection').style.display = 'block';
+            console.log('✅ 完了');
+        });
+
+        // ========================================
+        // ポートフォリオ計算
+        // ========================================
+        function calculatePortfolio(odds, raceDate, racePlace, raceNumber) {
+            const top3 = odds.slice(0, 3);
+            const bottom3 = odds.slice(-3);
+            const topAvg = top3.reduce((sum, o) => sum + o.オッズ, 0) / 3;
+            const bottomAvg = bottom3.reduce((sum, o) => sum + o.オッズ, 0) / 3;
+            const spread = bottomAvg / topAvg;
+
+            if (spread >= 2.0) {
+                const totalBudget = 1000;
+                const portfolio = [];
+                
+                top3.forEach(o => {
+                    const betAmount = Math.round(totalBudget / 3);
+                    portfolio.push({
+                        馬番: o.馬番,
+                        馬名: o.馬名,
+                        オッズ: o.オッズ,
+                        賭金: betAmount,
+                        期待値: betAmount * o.オッズ
+                    });
+                });
+                
+                const totalExpected = portfolio.reduce((sum, p) => sum + p.期待値, 0);
+                
+                return {
+                    割れ目あり: true,
+                    割れ目指数: spread.toFixed(2),
+                    推奨購入: portfolio,
+                    総投資: totalBudget,
+                    期待リターン: totalExpected.toFixed(0),
+                    平均期待値: (totalExpected / totalBudget).toFixed(2),
+                    レース情報: { raceDate, racePlace, raceNumber }
+                };
+            } else {
+                return {
+                    割れ目あり: false,
+                    割れ目指数: spread.toFixed(2),
+                    理由: '割れ目が不十分です（目安: 2.0倍以上）'
+                };
+            }
+        }
+
+        // ========================================
+        // ポートフォリオ情報を表示
+        // ========================================
+        function displayPortfolioInfo(portfolio) {
+            let html = '<div class="portfolio-info">';
+            html += '<h4>推奨購入内容</h4>';
+            
+            portfolio.推奨購入.forEach(p => {
+                html += `<p>🐎 <strong>${p.馬番}番（${p.馬名}）</strong>: ${p.賭金}円 @ ${p.オッズ.toFixed(2)}倍</p>`;
+            });
+            
+            html += `<p style="margin-top: 10px; font-size: 12px;">計: ${portfolio.総投資}円</p>`;
+            html += '</div>';
+            
+            document.getElementById('portfolioInfo').innerHTML = html;
+        }
+
+        // ========================================
+        // ウマカスマートへの自動入力
+        // ========================================
+        document.getElementById('goToUmaca').addEventListener('click', function() {
+            console.log('🏇 ウマカスマートボタンクリック');
+            
+            if (!cachedPortfolio || !cachedPortfolio.割れ目あり) {
+                showError('購入推奨のポートフォリオがありません');
+                return;
+            }
+
+            // ウマカスマートのページを開く
+            const umacaUrl = 'https://www.ipat.jra.go.jp/sp/umaca/index.cgi';
+            
+            const newWindow = window.open(umacaUrl, '_blank');
+            
+            // ウマカスマートのページが読み込まれるまで待機
+            if (newWindow) {
+                // 3秒後に自動入力を試みる
+                setTimeout(() => {
+                    autoFillUmaca(newWindow, cachedPortfolio);
+                }, 3000);
+                
+                console.log('✅ ウマカスマートのページを開きました');
+                alert('ウマカスマートのページが開きます。\n\n以下の内容を確認してください：\n\n' + 
+                      cachedPortfolio.推奨購入.map(p => `${p.馬番}番: ${p.賭金}円`).join('\n') +
+                      '\n\nページが読み込まれたら、自動入力が実行されます。\n投票内容を確認して「次へ」をタップしてください。');
+            } else {
+                showError('ウマカスマートのページを開けませんでした。ポップアップがブロックされていないか確認してください。');
+            }
+        });
+
+        // ========================================
+        // ウマカスマート自動入力関数
+        // ========================================
+        function autoFillUmaca(windowRef, portfolio) {
+            try {
+                console.log('🔄 ウマカスマート自動入力開始');
+                
+                // windowRef が利用可能か確認
+                if (!windowRef || windowRef.closed) {
+                    console.log('❌ ウマカスマートのウィンドウが閉じられました');
+                    return;
+                }
+
+                const doc = windowRef.document;
+                
+                // 馬番・金額の入力フィールドを探す
+                const inputs = doc.querySelectorAll('input[type="text"], input[type="number"]');
+                
+                console.log('見つかった入力フィールド:', inputs.length);
+                
+                // ダミーデータ: 各馬番の賭金をセット
+                let inputIndex = 0;
+                
+                portfolio.推奨購入.forEach(betInfo => {
+                    // 馬番を入力
+                    if (inputs[inputIndex]) {
+                        inputs[inputIndex].value = betInfo.馬番;
+                        inputs[inputIndex].dispatchEvent(new Event('input', { bubbles: true }));
+                        inputs[inputIndex].dispatchEvent(new Event('change', { bubbles: true }));
+                        console.log(`✅ 馬番 ${betInfo.馬番} を入力`);
+                        inputIndex++;
+                    }
+                    
+                    // 金額を入力
+                    if (inputs[inputIndex]) {
+                        inputs[inputIndex].value = betInfo.賭金;
+                        inputs[inputIndex].dispatchEvent(new Event('input', { bubbles: true }));
+                        inputs[inputIndex].dispatchEvent(new Event('change', { bubbles: true }));
+                        console.log(`✅ 金額 ${betInfo.賭金}円 を入力`);
+                        inputIndex++;
+                    }
+                });
+                
+                alert('🎯 自動入力が完了しました！\n\n入力内容を確認して、「次へ」ボタンをタップしてください。');
+                
+            } catch (error) {
+                console.error('❌ 自動入力エラー:', error);
+                alert('自動入力に失敗しました。\n\n手動で以下の内容を入力してください：\n\n' + 
+                      portfolio.推奨購入.map(p => `${p.馬番}番: ${p.賭金}円`).join('\n'));
+            }
+        }
+
+        // ========================================
+        // ヘルパー関数
+        // ========================================
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
