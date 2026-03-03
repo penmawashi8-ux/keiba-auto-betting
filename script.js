@@ -59,16 +59,18 @@ async function handleFetchOdds() {
 }
 
 async function fetchFromJraGo(raceDate, racePlace, raceNumber) {
-    console.log('🌐 jra.go.jp から取得中...');
+    console.log('🌐 プロキシ経由で jra.go.jp から取得中...');
     
     const [year, month, day] = raceDate.split('-');
     const dateStr = `${year}${month}${day}`;
     
-    const url = `https://www.jra.go.jp/keiba/data/odds/?rf_date=${dateStr}`;
-    console.log('URL:', url);
+    const targetUrl = `https://www.jra.go.jp/keiba/data/odds/?rf_date=${dateStr}`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+    
+    console.log('プロキシURL:', proxyUrl);
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(proxyUrl);
         const html = await response.text();
         
         console.log('HTML 取得成功');
@@ -107,11 +109,10 @@ async function fetchFromJraGo(raceDate, racePlace, raceNumber) {
         return odds.sort((a, b) => a.オッズ - b.オッズ);
 
     } catch (error) {
-        console.error('jra.go.jp エラー:', error);
+        console.error('プロキシ取得エラー:', error);
         throw error;
     }
 }
-
 function generateMockOdds() {
     console.log('🎲 ダミーオッズ生成');
     return [
