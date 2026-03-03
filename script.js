@@ -28,24 +28,24 @@ async function handleFetchOdds() {
     try {
         console.log('📊 オッズ取得開始...');
         
-        // プロキシ経由で取得を試みる
         let odds = null;
         
+        // 方法1: netkeiba から取得（最も安定）
         try {
-            odds = await fetchFromJraGoViaProxy(raceDate, racePlace, raceNumber);
-            console.log('✅ プロキシ取得成功');
+            console.log('方法1: netkeiba から取得���...');
+            odds = await fetchFromNetkeiba(raceDate, racePlace, raceNumber);
+            console.log('✅ netkeiba 取得成功');
         } catch (e) {
-            console.log('❌ プロキシ取得失敗:', e.message);
+            console.log('❌ netkeiba 取得失敗:', e.message);
+        }
+        
+        // 失敗したらダミー
+        if (!odds || odds.length === 0) {
             console.log('💾 ダミーデータを使用します');
             odds = generateMockOdds();
         }
         
         console.log('📊 取得したオッズ:', odds);
-        
-        if (!odds || odds.length === 0) {
-            console.log('❌ オッズが空。ダミー使用');
-            odds = generateMockOdds();
-        }
 
         const portfolio = calculatePortfolio(odds);
         cachedPortfolio = portfolio;
@@ -66,71 +66,129 @@ async function handleFetchOdds() {
         showLoading(false);
     }
 }
-
 // ========================================
 // プロキシ経由で JRA公式からオッズを取得
 // ========================================
-async function fetchFromJraGoViaProxy(raceDate, racePlace, raceNumber) {
-    console.log('🌐 プロキシ経由で jra.go.jp から取得中...');
+// ========================================
+// netkeiba からオッズを取得（最新版）
+// ========================================
+async function fetchFromNetkeiba(raceDate, racePlace, raceNumber) {
+    console.log('🌐 netkeiba から取得中...');
     
     const [year, month, day] = raceDate.split('-');
     const dateStr = `${year}${month}${day}`;
     
-    // JRA公式のオッズページ
-    const targetUrl = `https://www.jra.go.jp/keiba/data/odds/?rf_date=${dateStr}`;
+    // netkeiba のレース ID フォーマット: YYYYMMDDPPNN
+    // PP = 開催地コード
+    const placeCodeMap = {
+        '01': '01', // 札幌
+        '02': '02', // 函館
+        '03': '03', // 福島
+        '04': '04', // 新潟
+        '05': '05', // 東京
+        '06': '06', // 中山
+        '07': '07', // 中京
+        '08': '08', // 京都
+        '09': '09', // 阪神
+        '10': '10'  // 小倉
+    };
     
-    // 無料プロキ���サービス（複数用意）
-    const proxies = [
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
-        `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
-    ];
+    const placeCode = placeCodeMap[racePlace] || '06';
+    const raceId = dateStr + placeCode + String(raceNumber).padStart(2, '0');
     
-    let lastError = null;
+    const url = `https://race.netkeiba.com/race/shutuba.html?race_id=${raceId}`;
+    console.log('netkeiba URL:', url);
 
-    for (let i = 0; i < proxies.length; i++) {
-        try {
-            const proxyUrl = proxies[i];
-            console.log(`プロキシ${i + 1}を試行: ${proxyUrl.substring(0, 50)}...`);
+    try {
+        const response = await fetch(url);
+        const html = await response.text();
+        
+        console.log('✅ HTML 取得成功。長さ:', html.length);
 
-            const response = await fetch(proxyUrl, {
-                method: 'GET',
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15'
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const odds = [];
+        
+        // netkeiba のテーブル構造：
+        // <table> → <tr> → <td class="waku"> (馬番), <td class="odds"> (オッズ)
+        
+        const rows = doc.querySelectorAll('table tr');
+        console.log('テーブル行数:', rows.length);
+
+        rows.forEach((row, rowIndex) => {
+            try {
+                const cells = row.querySelectorAll('td');
+                
+                if (cells.length >= 2) {
+                    // 最初のセルから馬番を取得
+                    const horseNumText = cells[0]?.innerText.trim();
+                    const horseNum = parseInt(horseNumText);
+
+                    // オッズを取得（複数の候補をチェック）
+                    let oddsValue = null;
+                    let oddsCell = null;
+                    
+                    // class="odds" のセルを探す
+                    for (let i = 1; i < cells.length; i++) {
+                        const cell = cells[i];
+                        const classAttr = cell.getAttribute('class') || '';
+                        const text = cell.innerText.trim();
+                        const parsed = parseFloat(text);
+                        
+                        if ((classAttr.includes('odds') || !isNaN(parsed)) && parsed > 1.0 && parsed < 10000) {
+                            oddsValue = parsed;
+                            oddsCell = cell;
+                            break;
+                        }
+                    }
+
+                    if (horseNum > 0 && horseNum <= 18 && oddsValue && !isNaN(oddsValue)) {
+                        odds.push({
+                            馬番: horseNum,
+                            オッズ: oddsValue,
+                            馬名: '競走馬'
+                        });
+                        
+                        console.log(`✅ 行${rowIndex}: 馬番=${horseNum}, オッズ=${oddsValue}`);
+                    }
+                }
+            } catch (e) {
+                // 行のパース��敗はスキップ
+            }
+        });
+
+        console.log('📊 抽出したオッズ数:', odds.length);
+
+        if (odds.length === 0) {
+            // 代替パターン：全てのセルをスキャン
+            console.log('⚠️ 通常のパターンで見つからず。代替パターンを試行...');
+            
+            const allCells = doc.querySelectorAll('td');
+            console.log('総セル数:', allCells.length);
+            
+            allCells.forEach((cell, index) => {
+                const text = cell.innerText.trim();
+                const parsed = parseFloat(text);
+                
+                if (!isNaN(parsed) && parsed > 1.0 && parsed < 10000) {
+                    console.log(`セル${index}: ${text} → ${parsed}`);
                 }
             });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const html = await response.text();
             
-            console.log('✅ HTML 取得成功');
-            console.log('HTML長:', html.length);
-
-            // HTML をパース
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-
-            // オッズを抽出
-            const odds = extractOdds(doc);
-
-            if (odds && odds.length > 0) {
-                console.log('✅ オッズ抽出成功:', odds.length, '頭');
-                return odds;
-            } else {
-                console.log('⚠️ このプロキシではオッズが見つかりません');
-                lastError = new Error('オッズデータが見つかりません');
-            }
-
-        } catch (error) {
-            console.log(`❌ プロキシ${i + 1}失敗:`, error.message);
-            lastError = error;
+            throw new Error('オッズデータが見つかりません');
         }
-    }
 
-    // 全てのプロキシが失敗
-    throw lastError || new Error('���てのプロキシが失敗しました');
+        // オッズでソート
+        odds.sort((a, b) => a.オッズ - b.オッズ);
+        console.log('✅ オッズをソート完了:', odds);
+        
+        return odds;
+
+    } catch (error) {
+        console.error('❌ netkeiba 取得エラー:', error);
+        throw error;
+    }
 }
 
 // ========================================
