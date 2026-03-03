@@ -1,481 +1,475 @@
-console.log('✅✅✅ script.js が読み込まれました！！！');
+console.log(‘✅ script.js 読み込み完了’);
 
 let cachedPortfolio = null;
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔵 DOMContentLoaded');
-    document.getElementById('fetchOdds').addEventListener('click', handleFetchOdds);
-    document.getElementById('goToUmaca').addEventListener('click', handleGoToUmaca);
+// 競馬場コード → netkeiba場コード のマッピング
+const PLACE_CODE_MAP = {
+‘01’: ‘01’, // 札幌
+‘02’: ‘02’, // 函館
+‘03’: ‘03’, // 福島
+‘04’: ‘04’, // 新潟
+‘05’: ‘05’, // 東京
+‘06’: ‘06’, // 中山
+‘07’: ‘07’, // 中京
+‘08’: ‘08’, // 京都
+‘09’: ‘09’, // 阪神
+‘10’: ‘10’, // 小倉
+};
+
+document.addEventListener(‘DOMContentLoaded’, function () {
+// デフォルト日付を今日に設定
+const today = new Date().toISOString().split(‘T’)[0];
+document.getElementById(‘raceDate’).value = today;
+
+```
+document.getElementById('fetchOdds').addEventListener('click', handleFetchOdds);
+document.getElementById('goToUmaca').addEventListener('click', handleGoToUmaca);
+```
+
 });
 
+// ========================================
+// メイン: オッズ取得ハンドラ
+// ========================================
 async function handleFetchOdds() {
-    console.log('🔵🔵🔵 オッズ取得ボタンクリック');
-    
-    const raceDate = document.getElementById('raceDate').value;
-    const racePlace = document.getElementById('racePlace').value;
-    const raceNumber = document.getElementById('raceNumber').value;
+const raceDate = document.getElementById(‘raceDate’).value;
+const racePlace = document.getElementById(‘racePlace’).value;
+const kaisai = document.getElementById(‘kaisai’).value.padStart(2, ‘0’);
+const raceNumber = document.getElementById(‘raceNumber’).value.padStart(2, ‘0’);
 
-    console.log(`入力値: 日付=${raceDate}, 開催地=${racePlace}, レース=${raceNumber}`);
-
-    if (!raceDate || !racePlace || !raceNumber) {
-        showError('すべての項目を入力してください');
-        return;
-    }
-
-    hideError();
-    showLoading(true);
-
-    try {
-        console.log('📊 オッズ取得開始...');
-        
-        let odds = null;
-        
-        // 方法1: netkeiba から取得（最も安定）
-        try {
-            console.log('方法1: netkeiba から取得���...');
-            odds = await fetchFromNetkeiba(raceDate, racePlace, raceNumber);
-            console.log('✅ netkeiba 取得成功');
-        } catch (e) {
-            console.log('❌ netkeiba 取得失敗:', e.message);
-        }
-        
-        // 失敗したらダミー
-        if (!odds || odds.length === 0) {
-            console.log('💾 ダミーデータを使用します');
-            odds = generateMockOdds();
-        }
-        
-        console.log('📊 取得したオッズ:', odds);
-
-        const portfolio = calculatePortfolio(odds);
-        cachedPortfolio = portfolio;
-
-        displayResults(odds, portfolio);
-
-        if (portfolio.割れ目あり) {
-            displayPortfolioInfo(portfolio);
-            document.getElementById('portfolioData').style.display = 'block';
-        }
-
-        document.getElementById('outputSection').style.display = 'block';
-        
-    } catch (error) {
-        console.error('❌ エラー:', error);
-        showError('エラー: ' + error.message);
-    } finally {
-        showLoading(false);
-    }
+```
+if (!raceDate || !racePlace || !kaisai || !raceNumber) {
+    showError('すべての項目を入力してください');
+    return;
 }
-// ========================================
-// プロキシ経由で JRA公式からオッズを取得
-// ========================================
-// ========================================
-// netkeiba からオッズを取得（最新版）
-// ========================================
-async function fetchFromNetkeiba(raceDate, racePlace, raceNumber) {
-    console.log('🌐 netkeiba から取得中...');
-    
-    const [year, month, day] = raceDate.split('-');
-    const dateStr = `${year}${month}${day}`;
-    
-    // netkeiba のレース ID フォーマット: YYYYMMDDPPNN
-    // PP = 開催地コード
-    const placeCodeMap = {
-        '01': '01', // 札幌
-        '02': '02', // 函館
-        '03': '03', // 福島
-        '04': '04', // 新潟
-        '05': '05', // 東京
-        '06': '06', // 中山
-        '07': '07', // 中京
-        '08': '08', // 京都
-        '09': '09', // 阪神
-        '10': '10'  // 小倉
-    };
-    
-    const placeCode = placeCodeMap[racePlace] || '06';
-    const raceId = dateStr + placeCode + String(raceNumber).padStart(2, '0');
-    
-    const url = `https://race.netkeiba.com/race/shutuba.html?race_id=${raceId}`;
-    console.log('netkeiba URL:', url);
 
+hideError();
+showLoading(true);
+document.getElementById('outputSection').style.display = 'none';
+
+let odds = null;
+let dataSource = '';
+
+try {
+    // ① netkeiba経由で取得を試みる
     try {
-        const response = await fetch(url);
-        const html = await response.text();
-        
-        console.log('✅ HTML 取得成功。長さ:', html.length);
+        odds = await fetchFromNetkeiba(raceDate, racePlace, kaisai, raceNumber);
+        dataSource = '📡 netkeibaよりリアルタイム取得';
+        console.log('✅ netkeiba取得成功');
+    } catch (e) {
+        console.warn('⚠️ netkeiba取得失敗:', e.message);
+    }
 
+    // ② 失敗したらJRA公式HTMLをプロキシ経由で試みる
+    if (!odds || odds.length === 0) {
+        try {
+            odds = await fetchFromJraViaProxy(raceDate, racePlace, kaisai, raceNumber);
+            dataSource = '📡 JRA公式よりリアルタイム取得';
+            console.log('✅ JRA取得成功');
+        } catch (e) {
+            console.warn('⚠️ JRA取得失敗:', e.message);
+        }
+    }
+
+    // ③ 全て失敗 → ダミーデータ
+    if (!odds || odds.length === 0) {
+        odds = generateMockOdds();
+        dataSource = '⚠️ デモデータ（実際のオッズ取得に失敗）';
+        console.log('💾 ダミーデータを使用');
+    }
+
+    const portfolio = calculatePortfolio(odds);
+    cachedPortfolio = portfolio;
+
+    document.getElementById('dataSource').textContent = dataSource;
+    displayResults(odds, portfolio);
+
+    if (portfolio.割れ目あり) {
+        displayPortfolioInfo(portfolio);
+        document.getElementById('portfolioData').style.display = 'block';
+    } else {
+        document.getElementById('portfolioData').style.display = 'none';
+    }
+
+    document.getElementById('outputSection').style.display = 'block';
+
+} catch (error) {
+    console.error('❌ 予期しないエラー:', error);
+    showError('エラーが発生しました: ' + error.message);
+} finally {
+    showLoading(false);
+}
+```
+
+}
+
+// ========================================
+// ① netkeibaのオッズページから取得
+//    URL例: https://race.netkeiba.com/odds/index.html?race_id=202406050811
+//    race_id = 年(4桁) + 場コード(2桁) + 開催回(2桁) + 日目(2桁) + レース番号(2桁)
+//    ※「日目」はkaisaiをそのまま流用（簡易版）
+// ========================================
+async function fetchFromNetkeiba(raceDate, racePlace, kaisai, raceNumber) {
+const [year, month, day] = raceDate.split(’-’);
+
+```
+// race_id の組み立て
+// netkeibaのrace_idは: YYYY + 場コード(2桁) + 開催回(2桁) + 開催日目(2桁) + レース番号(2桁)
+// 開催日目はユーザー入力の「kaisai」で代替（簡易的に）
+const raceId = `${year}${PLACE_CODE_MAP[racePlace]}${kaisai}${kaisai}${raceNumber}`;
+const targetUrl = `https://race.netkeiba.com/odds/index.html?race_id=${raceId}&type=b1`;
+
+console.log('🌐 netkeiba URL:', targetUrl);
+
+const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+
+const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+const html = await response.text();
+console.log('HTML取得完了 length:', html.length);
+
+return parseNetkeibaOdds(html);
+```
+
+}
+
+// ========================================
+// netkeibaのHTMLからオッズを抽出
+// ========================================
+function parseNetkeibaOdds(html) {
+const parser = new DOMParser();
+const doc = parser.parseFromString(html, ‘text/html’);
+const odds = [];
+
+```
+// netkeibaの単勝オッズテーブル: id="odds_tan_block" or class含む
+// 各行 <tr> に馬番・馬名・オッズが入っている
+const rows = doc.querySelectorAll('tr');
+
+rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length < 3) return;
+
+    // 馬番は通常1列目
+    const numText = (cells[0].textContent || '').trim();
+    const horseNum = parseInt(numText);
+    if (isNaN(horseNum) || horseNum < 1 || horseNum > 18) return;
+
+    // 馬名は2〜3列目あたり
+    let horseName = '';
+    for (let i = 1; i < Math.min(cells.length, 4); i++) {
+        const t = (cells[i].textContent || '').trim();
+        if (t.length >= 2 && t.length <= 12 && !/^\d/.test(t) && !/倍|円/.test(t)) {
+            horseName = t;
+            break;
+        }
+    }
+
+    // オッズは数値で「X.X」形式のセルを探す
+    let oddsValue = null;
+    for (let i = cells.length - 1; i >= 1; i--) {
+        const t = (cells[i].textContent || '').replace(/[,\s]/g, '').trim();
+        const v = parseFloat(t);
+        if (!isNaN(v) && v >= 1.0 && v < 9999) {
+            oddsValue = v;
+            break;
+        }
+    }
+
+    if (horseNum && oddsValue) {
+        odds.push({
+            馬番: horseNum,
+            馬名: horseName || `${horseNum}番`,
+            オッズ: oddsValue,
+        });
+    }
+});
+
+// 重複排除（馬番ベース）
+const seen = new Set();
+const unique = odds.filter(o => {
+    if (seen.has(o.馬番)) return false;
+    seen.add(o.馬番);
+    return true;
+});
+
+unique.sort((a, b) => a.オッズ - b.オッズ);
+console.log(`✅ netkeiba抽出結果: ${unique.length}頭`);
+return unique;
+```
+
+}
+
+// ========================================
+// ② JRA公式HTMLをプロキシ経由で取得（フォールバック）
+// ========================================
+async function fetchFromJraViaProxy(raceDate, racePlace, kaisai, raceNumber) {
+const [year, month, day] = raceDate.split(’-’);
+const dateStr = `${year}${month}${day}`;
+
+```
+// JRA公式オッズページのURL（単勝・複勝）
+const targetUrl = `https://www.jra.go.jp/keiba/odds/tanfuku/${dateStr}${racePlace}${kaisai}${raceNumber}.html`;
+console.log('🌐 JRA URL:', targetUrl);
+
+const proxies = [
+    `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+];
+
+for (const proxyUrl of proxies) {
+    try {
+        const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(7000) });
+        if (!response.ok) continue;
+
+        const html = await response.text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
+        const odds = extractOddsFromJraHtml(doc);
 
-        const odds = [];
-        
-        // netkeiba のテーブル構造：
-        // <table> → <tr> → <td class="waku"> (馬番), <td class="odds"> (オッズ)
-        
-        const rows = doc.querySelectorAll('table tr');
-        console.log('テーブル行数:', rows.length);
+        if (odds.length > 0) return odds;
+    } catch (e) {
+        console.warn('プロキシ失敗:', e.message);
+    }
+}
 
-        rows.forEach((row, rowIndex) => {
-            try {
-                const cells = row.querySelectorAll('td');
-                
-                if (cells.length >= 2) {
-                    // 最初のセルから馬番を取得
-                    const horseNumText = cells[0]?.innerText.trim();
-                    const horseNum = parseInt(horseNumText);
+throw new Error('JRAからの取得に失敗しました');
+```
 
-                    // オッズを取得（複数の候補をチェック）
-                    let oddsValue = null;
-                    let oddsCell = null;
-                    
-                    // class="odds" のセルを探す
-                    for (let i = 1; i < cells.length; i++) {
-                        const cell = cells[i];
-                        const classAttr = cell.getAttribute('class') || '';
-                        const text = cell.innerText.trim();
-                        const parsed = parseFloat(text);
-                        
-                        if ((classAttr.includes('odds') || !isNaN(parsed)) && parsed > 1.0 && parsed < 10000) {
-                            oddsValue = parsed;
-                            oddsCell = cell;
-                            break;
-                        }
-                    }
+}
 
-                    if (horseNum > 0 && horseNum <= 18 && oddsValue && !isNaN(oddsValue)) {
-                        odds.push({
-                            馬番: horseNum,
-                            オッズ: oddsValue,
-                            馬名: '競走馬'
-                        });
-                        
-                        console.log(`✅ 行${rowIndex}: 馬番=${horseNum}, オッズ=${oddsValue}`);
-                    }
-                }
-            } catch (e) {
-                // 行のパース��敗はスキップ
-            }
-        });
+// ========================================
+// JRA公式HTMLからオッズを抽出
+// ========================================
+function extractOddsFromJraHtml(doc) {
+const odds = [];
+const rows = doc.querySelectorAll(‘table tr’);
 
-        console.log('📊 抽出したオッズ数:', odds.length);
+```
+rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length < 2) return;
 
-        if (odds.length === 0) {
-            // 代替パターン：全てのセルをスキャン
-            console.log('⚠️ 通常のパターンで見つからず。代替パターンを試行...');
-            
-            const allCells = doc.querySelectorAll('td');
-            console.log('総セル数:', allCells.length);
-            
-            allCells.forEach((cell, index) => {
-                const text = cell.innerText.trim();
-                const parsed = parseFloat(text);
-                
-                if (!isNaN(parsed) && parsed > 1.0 && parsed < 10000) {
-                    console.log(`セル${index}: ${text} → ${parsed}`);
-                }
-            });
-            
-            throw new Error('オッズデータが見つかりません');
+    const numText = (cells[0].textContent || '').trim();
+    const horseNum = parseInt(numText);
+    if (isNaN(horseNum) || horseNum < 1 || horseNum > 18) return;
+
+    let oddsValue = null;
+    for (let i = cells.length - 1; i >= 1; i--) {
+        const t = (cells[i].textContent || '').replace(/[,\s]/g, '').trim();
+        const v = parseFloat(t);
+        if (!isNaN(v) && v >= 1.0 && v < 9999) {
+            oddsValue = v;
+            break;
         }
-
-        // オッズでソート
-        odds.sort((a, b) => a.オッズ - b.オッズ);
-        console.log('✅ オッズをソート完了:', odds);
-        
-        return odds;
-
-    } catch (error) {
-        console.error('❌ netkeiba 取得エラー:', error);
-        throw error;
     }
+
+    let horseName = '';
+    for (let i = 1; i < Math.min(cells.length, 4); i++) {
+        const t = (cells[i].textContent || '').trim();
+        if (t.length >= 2 && t.length <= 12 && !/^\d/.test(t)) {
+            horseName = t;
+            break;
+        }
+    }
+
+    if (horseNum && oddsValue) {
+        odds.push({ 馬番: horseNum, 馬名: horseName || `${horseNum}番`, オッズ: oddsValue });
+    }
+});
+
+odds.sort((a, b) => a.オッズ - b.オッズ);
+return odds;
+```
+
 }
 
 // ========================================
-// HTMLからオッズを抽出
-// ========================================
-function extractOdds(doc) {
-    console.log('🔍 オッズを抽出中...');
-    
-    const odds = [];
-    
-    // パターン1: テーブル内の <tr> から抽出
-    const rows = doc.querySelectorAll('table tr');
-    console.log('テーブル行数:', rows.length);
-
-    if (rows.length > 0) {
-        rows.forEach((row, rowIndex) => {
-            try {
-                const cells = row.querySelectorAll('td');
-                
-                if (cells.length >= 2) {
-                    // 最初のセルが馬番
-                    const horseNumText = cells[0]?.innerText.trim();
-                    const horseNum = parseInt(horseNumText);
-
-                    // 最後から2番目か最後のセルがオッズ
-                    let oddsValue = null;
-                    
-                    // 複数の候補をチェック
-                    for (let i = cells.length - 1; i >= 1; i--) {
-                        const text = cells[i]?.innerText.trim();
-                        const parsed = parseFloat(text);
-                        
-                        if (!isNaN(parsed) && parsed > 1.0 && parsed < 10000) {
-                            oddsValue = parsed;
-                            break;
-                        }
-                    }
-
-                    if (horseNum > 0 && horseNum <= 18 && oddsValue) {
-                        odds.push({
-                            馬番: horseNum,
-                            オッズ: oddsValue,
-                            馬名: '競走馬'
-                        });
-                        
-                        console.log(`行${rowIndex}: 馬番=${horseNum}, オッズ=${oddsValue}`);
-                    }
-                }
-            } catch (e) {
-                // 行のパース失敗
-            }
-        });
-    }
-
-    console.log('抽出結果:', odds.length, '頭');
-
-    if (odds.length === 0) {
-        console.log('⚠️ テーブルからは抽出できず。他のパターンを試行...');
-        
-        // パターン2: <strong> タグから抽出
-        const strongElements = doc.querySelectorAll('strong');
-        strongElements.forEach((el) => {
-            const text = el.innerText.trim();
-            const oddsMatch = text.match(/(\d+\.?\d*)/);
-            if (oddsMatch) {
-                console.log('strong:', text);
-            }
-        });
-    }
-
-    // ソート
-    if (odds.length > 0) {
-        odds.sort((a, b) => a.オッズ - b.オッズ);
-        console.log('✅ オッズをソート完了');
-    }
-
-    return odds;
-}
-
-// ========================================
-// ダミーオッズを生成
+// ③ ダミーオッズ（デモ用）
 // ========================================
 function generateMockOdds() {
-    console.log('🎲 ダミーオッズ生成');
-    return [
-        { 馬番: 1, オッズ: 2.1, 馬名: 'サンプル①' },
-        { 馬番: 2, オッズ: 3.5, 馬名: 'サンプル②' },
-        { 馬番: 3, オッズ: 4.2, 馬名: 'サンプル③' },
-        { 馬番: 4, オッズ: 8.5, 馬名: 'サンプル④' },
-        { 馬番: 5, オッズ: 12.0, 馬名: 'サンプル⑤' },
-        { 馬番: 6, オッズ: 18.5, 馬名: 'サンプル⑥' },
-        { 馬番: 7, オッズ: 25.0, 馬名: 'サンプル⑦' },
-        { 馬番: 8, オッズ: 32.0, 馬名: 'サンプル⑧' },
-    ];
+return [
+{ 馬番: 3, オッズ: 2.1, 馬名: ‘アローエクスプレス’ },
+{ 馬番: 7, オッズ: 3.5, 馬名: ‘ゴールドシップ’ },
+{ 馬番: 1, オッズ: 4.2, 馬名: ‘ディープインパクト’ },
+{ 馬番: 11, オッズ: 8.5, 馬名: ‘キングカメハメハ’ },
+{ 馬番: 5, オッズ: 12.0, 馬名: ‘オルフェーヴル’ },
+{ 馬番: 9, オッズ: 18.5, 馬名: ‘ジェンティルドンナ’ },
+{ 馬番: 2, オッズ: 25.0, 馬名: ‘ブエナビスタ’ },
+{ 馬番: 14, オッズ: 35.0, 馬名: ‘ウオッカ’ },
+{ 馬番: 6, オッズ: 48.0, 馬名: ‘ダイワスカーレット’ },
+{ 馬番: 12, オッズ: 62.0, 馬名: ‘テイエムオペラオー’ },
+].sort((a, b) => a.オッズ - b.オッズ);
 }
 
 // ========================================
-// ポートフォリオを計算
+// ポートフォリオ計算
+// 上位人気と下位人気のオッズ差（割れ目）を判定
+// 推奨馬への賭金を逆数比で配分（期待値が均等になるよう）
 // ========================================
 function calculatePortfolio(odds) {
-    if (!odds || odds.length < 3) {
-        return {
-            割れ目あり: false,
-            理由: '馬が足りません'
-        };
-    }
+if (!odds || odds.length < 4) {
+return { 割れ目あり: false, 理由: ‘出走馬が少なすぎます’ };
+}
 
-    const top3 = odds.slice(0, 3);
-    const bottom3 = odds.slice(-3);
+```
+const top3 = odds.slice(0, 3);  // 上位人気3頭
+const rest = odds.slice(3);      // それ以降
 
-    const topAvg = top3.reduce((sum, o) => sum + o.オッズ, 0) / 3;
-    const bottomAvg = bottom3.reduce((sum, o) => sum + o.オッズ, 0) / 3;
-    const spread = bottomAvg / topAvg;
+const topAvg = top3.reduce((s, o) => s + o.オッズ, 0) / top3.length;
+const restAvg = rest.reduce((s, o) => s + o.オッズ, 0) / rest.length;
+const spread = restAvg / topAvg;
 
-    console.log(`割れ目: top=${topAvg.toFixed(2)}, bottom=${bottomAvg.toFixed(2)}, spread=${spread.toFixed(2)}`);
+console.log(`割れ目指数: top平均=${topAvg.toFixed(1)}, rest平均=${restAvg.toFixed(1)}, spread=${spread.toFixed(2)}`);
 
-    if (spread >= 2.0) {
-        const totalBudget = 1000;
-        const portfolio = [];
+if (spread < 2.0) {
+    return {
+        割れ目あり: false,
+        割れ目指数: spread.toFixed(2),
+        理由: '割れ目が小さいため購入見送り（目安: 2.0倍以上）'
+    };
+}
 
-        top3.forEach(o => {
-            const betAmount = Math.round(totalBudget / 3);
-            portfolio.push({
-                馬番: o.馬番,
-                馬名: o.馬名,
-                オッズ: o.オッズ,
-                賭金: betAmount,
-                期待値: (betAmount * o.オッズ).toFixed(0)
-            });
-        });
+// 賭金を逆数比で計算（オッズが低い馬に多く賭ける）
+const totalBudget = 1000; // 合計1000円
+const inverses = top3.map(o => 1 / o.オッズ);
+const sumInverse = inverses.reduce((s, v) => s + v, 0);
 
-        const totalExpected = portfolio.reduce((s, p) => s + parseFloat(p.期待値), 0);
+const portfolio = top3.map((o, i) => {
+    // 100円単位に丸める
+    const rawAmount = (inverses[i] / sumInverse) * totalBudget;
+    const betAmount = Math.round(rawAmount / 100) * 100 || 100;
+    return {
+        馬番: o.馬番,
+        馬名: o.馬名,
+        オッズ: o.オッズ,
+        賭金: betAmount,
+        期待値: Math.round(betAmount * o.オッズ),
+    };
+});
 
-        return {
-            割れ目あり: true,
-            割れ目指数: spread.toFixed(2),
-            推奨購入: portfolio,
-            総投資: totalBudget,
-            期待リターン: totalExpected.toFixed(0)
-        };
-    } else {
-        return {
-            割れ目あり: false,
-            割れ目指数: spread.toFixed(2)
-        };
-    }
+const totalInvested = portfolio.reduce((s, p) => s + p.賭金, 0);
+const maxReturn = Math.max(...portfolio.map(p => p.期待値));
+
+return {
+    割れ目あり: true,
+    割れ目指数: spread.toFixed(2),
+    推奨購入: portfolio,
+    総投資: totalInvested,
+    最大リターン: maxReturn,
+    最小利益: maxReturn - totalInvested,
+};
+```
+
 }
 
 // ========================================
 // 結果を表示
 // ========================================
 function displayResults(odds, portfolio) {
-    console.log('💾 結果を表示中...');
+let html = ‘<h3>📊 単勝オッズ一覧（人気順）</h3>’;
+html += ‘<table><thead><tr><th>人気</th><th>馬番</th><th>馬名</th><th>単勝オッズ</th></tr></thead><tbody>’;
 
-    let html = '<h3>📊 オッズ一覧</h3>';
-    html += '<table><tr><th>馬番</th><th>馬名</th><th>オッズ</th></tr>';
-    
-    odds.forEach(o => {
-        html += `<tr><td>${o.馬番}</td><td>${o.馬名}</td><td>${o.オッズ.toFixed(2)}</td></tr>`;
-    });
-    
-    html += '</table>';
+```
+odds.forEach((o, i) => {
+    const highlight = portfolio.割れ目あり && portfolio.推奨購入?.some(p => p.馬番 === o.馬番);
+    const rowStyle = highlight ? 'background:#fff3cd;font-weight:bold;' : '';
+    html += `<tr style="${rowStyle}">
+        <td>${i + 1}番人気</td>
+        <td>${o.馬番}</td>
+        <td>${o.馬名}</td>
+        <td>${o.オッズ.toFixed(1)}倍</td>
+    </tr>`;
+});
 
-    if (portfolio.割れ目あり) {
-        html += `<div style="background:#d4edda;padding:10px;border-radius:5px;color:#155724;margin:10px 0;">
-            ✅ <strong>割れ目検出！購入推奨</strong><br>
-            割れ目指数: <strong>${portfolio.割れ目指数}倍</strong>
-        </div>`;
-        
-        html += '<h3>推奨購入内容</h3>';
-        html += '<table><tr><th>馬番</th><th>馬名</th><th>オッズ</th><th>賭金</th></tr>';
-        
-        portfolio.推奨購入.forEach(p => {
-            html += `<tr><td>${p.馬番}</td><td>${p.馬名}</td><td>${p.オッズ.toFixed(2)}</td><td>${p.賭金}円</td></tr>`;
-        });
-        
-        html += '</table>';
-        html += `<p><strong>総投資: ${portfolio.総投資}円</strong></p>`;
-        html += `<p><strong>期待リターン: ${portfolio.期待リターン}円</strong></p>`;
-    } else {
-        html += `<div style="background:#f8d7da;padding:10px;border-radius:5px;color:#721c24;margin:10px 0;">
-            ❌ <strong>購入見送り</strong><br>
-            割れ目指数: ${portfolio.割れ目指数}倍（目安: 2.0倍以上）
-        </div>`;
-    }
+html += '</tbody></table>';
 
-    document.getElementById('oddsResult').innerHTML = html;
+if (portfolio.割れ目あり) {
+    html += `<div class="alert-success">
+        ✅ <strong>割れ目検出！購入推奨</strong><br>
+        割れ目指数: <strong>${portfolio.割れ目指数}倍</strong>（上位と下位のオッズ差）
+    </div>`;
+} else {
+    html += `<div class="alert-danger">
+        ❌ <strong>購入見送り</strong><br>
+        割れ目指数: ${portfolio.割れ目指数}倍 — ${portfolio.理由}
+    </div>`;
+}
+
+document.getElementById('oddsResult').innerHTML = html;
+```
+
 }
 
 // ========================================
 // ポートフォリオ情報を表示
 // ========================================
 function displayPortfolioInfo(portfolio) {
-    let html = '<div style="background:#d4edda;padding:15px;border-radius:8px;border-left:4px solid #28a745;">';
-    
-    portfolio.推奨購入.forEach(p => {
-        html += `<p>🐎 <strong>${p.馬番}番（${p.馬名}）</strong>: ${p.賭金}円 @ ${p.オッズ.toFixed(2)}倍</p>`;
-    });
-    
-    html += `<p style="margin-top:10px;font-size:12px;">合計: ${portfolio.総投資}円</p>`;
-    html += '</div>';
+let html = ‘<div class="portfolio-box">’;
 
-    document.getElementById('portfolioInfo').innerHTML = html;
+```
+portfolio.推奨購入.forEach(p => {
+    html += `<div class="bet-row">
+        🐎 <strong>${p.馬番}番 ${p.馬名}</strong>
+        <span class="bet-amount">${p.賭金}円</span>
+        <span class="odds-label">@ ${p.オッズ.toFixed(1)}倍 → 的中時 ${p.期待値}円</span>
+    </div>`;
+});
+
+html += `<div class="summary-row">
+    <span>合計投資: <strong>${portfolio.総投資}円</strong></span>
+    <span>最大リターン: <strong>${portfolio.最大リターン}円</strong>
+    （最低利益: <strong>+${portfolio.最小利益}円</strong>）</span>
+</div>`;
+html += '</div>';
+
+document.getElementById('portfolioInfo').innerHTML = html;
+```
+
 }
 
 // ========================================
-// ウマカスマートへのボタン
+// ウマカスマートへ誘導
 // ========================================
 function handleGoToUmaca() {
-    console.log('🏇 ウマカスマートボタンクリック');
+if (!cachedPortfolio?.割れ目あり) {
+showError(‘購入推奨のポートフォリオがありません’);
+return;
+}
 
-    if (!cachedPortfolio?.割れ目あり) {
-        showError('購入推奨のポートフォリオがありません');
-        return;
-    }
+```
+const summary = cachedPortfolio.推奨購入
+    .map(p => `${p.馬番}番（${p.馬名}）: ${p.賭金}円`)
+    .join('\n');
 
-    const umacaUrl = 'https://www.ipat.jra.go.jp/sp/umaca/index.cgi';
-    const newWindow = window.open(umacaUrl, '_blank');
+alert(
+    '【ウマカスマートへの入力内容】\n\n' +
+    '馬券種別: 単勝\n\n' +
+    summary +
+    '\n\n合計: ' + cachedPortfolio.総投資 + '円\n\n' +
+    'ウマカスマートを開きます。\n' +
+    '※ログイン後、上記内容を手動で入力してください。\n' +
+    '（クロスドメイン制限により自動入力はご利用の環境によって動作しない場合があります）'
+);
 
-    if (newWindow) {
-        setTimeout(() => {
-            autoFillUmaca(newWindow, cachedPortfolio);
-        }, 3000);
+const umacaUrl = 'https://www.ipat.jra.go.jp/sp/umaca/index.cgi';
+window.open(umacaUrl, '_blank');
+```
 
-        alert('ウマカスマートのページが開きます。\n\n以下の内容を確認してください：\n\n' +
-            cachedPortfolio.推奨購入.map(p => `${p.馬番}番: ${p.賭金}円`).join('\n') +
-            '\n\nページが読み込まれたら、自動入力が実行されます。');
-    } else {
-        showError('ウマカスマートのページを開けませんでした');
-    }
 }
 
 // ========================================
-// ウマカスマート自動入力
+// ヘルパー
 // ========================================
-function autoFillUmaca(windowRef, portfolio) {
-    try {
-        console.log('🔄 自動入力開始');
-
-        if (!windowRef || windowRef.closed) {
-            console.log('❌ ウィンドウが閉じられました');
-            return;
-        }
-
-        const doc = windowRef.document;
-        const inputs = doc.querySelectorAll('input[type="text"], input[type="number"]');
-
-        console.log('入力フィールド数:', inputs.length);
-
-        let inputIndex = 0;
-
-        portfolio.推奨購入.forEach(betInfo => {
-            if (inputs[inputIndex]) {
-                inputs[inputIndex].value = betInfo.馬番;
-                inputs[inputIndex].dispatchEvent(new Event('input', { bubbles: true }));
-                inputIndex++;
-            }
-
-            if (inputs[inputIndex]) {
-                inputs[inputIndex].value = betInfo.賭金;
-                inputs[inputIndex].dispatchEvent(new Event('input', { bubbles: true }));
-                inputIndex++;
-            }
-        });
-
-        alert('🎯 自動入力が完了しました！\n\n「次へ」をタップしてください。');
-
-    } catch (error) {
-        console.error('❌ 自動入力エラー:', error);
-        alert('自動入力に失敗しました。手動で入力してください。');
-    }
+function showError(msg) {
+const el = document.getElementById(‘error’);
+el.textContent = msg;
+el.style.display = ‘block’;
 }
-
-// ========================================
-// ヘルパー関数
-// ========================================
-function showError(message) {
-    document.getElementById('error').textContent = message;
-    document.getElementById('error').style.display = 'block';
-    console.error('🚨', message);
-}
-
 function hideError() {
-    document.getElementById('error').style.display = 'none';
+document.getElementById(‘error’).style.display = ‘none’;
 }
-
 function showLoading(show) {
-    document.getElementById('loading').style.display = show ? 'block' : 'none';
-    console.log(show ? '⏳ ローディング開始' : '⏳ ローディング終了');
+document.getElementById(‘loading’).style.display = show ? ‘block’ : ‘none’;
 }
