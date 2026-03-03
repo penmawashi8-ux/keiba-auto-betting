@@ -38,16 +38,36 @@
         </div>
 
         <div class="form-group">
-            <label for="kaisai">開催回 (1〜5):</label>
+            <label for="kaisai">開催回 (1〜5回):</label>
             <input type="number" id="kaisai" min="1" max="5" value="1">
+        </div>
+
+        <div class="form-group">
+            <label for="day">開催日目 (1〜8日目):</label>
+            <input type="number" id="day" min="1" max="8" value="1">
         </div>
         
         <div class="form-group">
             <label for="raceNumber">レース番号 (1〜12):</label>
             <input type="number" id="raceNumber" min="1" max="12" value="11">
         </div>
+
+        <div id="raceIdDisplay" class="race-id-badge"></div>
         
         <button id="fetchOdds" class="btn-primary">📡 オッズを取得</button>
+        <p class="hint">※ オッズ取得前にGitHub Actionsを実行してください（下記手順参照）</p>
+    </div>
+
+    <div class="howto-section">
+        <h2>📋 使い方（GitHub Actions でオッズ取得）</h2>
+        <ol>
+            <li>上のフォームで開催地・回・日目・レースを入力する</li>
+            <li>「race_id: XXXX」が表示されるので確認する</li>
+            <li>GitHubリポジトリ → <strong>Actions</strong> → <strong>オッズ取得</strong> → <strong>Run workflow</strong></li>
+            <li>race_id を入力して実行（約30秒で完了）</li>
+            <li>このページに戻って「📡 オッズを取得」ボタンを押す</li>
+        </ol>
+        <p class="hint">⏱ 締め切り1〜2分前に実行するのがベストタイミングです</p>
     </div>
 
     <div id="error" class="error" style="display: none;"></div>
