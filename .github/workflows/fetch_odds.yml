@@ -1,75 +1,32 @@
-# .github/workflows/fetch_odds.yml
-
-# 
-
-# 使い方:
-
-# GitHub の Actions タブ → “オッズ取得” → Run workflow
-
-# race_id を入力して実行する（手動トリガー）
-
-# 
-
-# race_id の構造:
-
-# 2026 06 02 02 11
-
-# 年   場  回  日  レース番号
-
-# 例: 202606020211 = 2026年・中山・第2回・2日目・11レース
-
-name: オッズ取得
+name: fetch-odds
 
 on:
-
-# ① 手動実行（GitHub ActionsのUIからボタン1つで実行）
-
-workflow_dispatch:
-inputs:
-race_id:
-description: ‘race_id（例: 202606020211）’
-required: true
-type: string
-
-# ② 毎週土日の9:00〜16:00 JST に毎5分自動実行したい場合は以下を有効化
-
-# ※ GitHub Actionsの schedule は UTC なので JST-9時間
-
-# schedule:
-
-# - cron: ‘*/5 0-7 * * 6,0’   # 土日 UTC 0:00-7:55 = JST 9:00-16:55
+  workflow_dispatch:
+    inputs:
+      race_id:
+        description: 'race_id'
+        required: true
+        type: string
 
 jobs:
-fetch:
-runs-on: ubuntu-latest
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
 
-```
-permissions:
-  contents: write   # odds.json をリポジトリにコミットするために必要
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-steps:
-  - name: リポジトリをチェックアウト
-    uses: actions/checkout@v4
+      - run: pip install requests
 
-  - name: Python セットアップ
-    uses: actions/setup-python@v5
-    with:
-      python-version: '3.12'
+      - run: python fetch_odds.py "${{ github.event.inputs.race_id }}"
 
-  - name: 依存パッケージをインストール
-    run: pip install requests
-
-  - name: オッズを取得して odds.json に保存
-    env:
-      RACE_ID: ${{ github.event.inputs.race_id }}
-    run: python fetch_odds.py "$RACE_ID"
-
-  - name: odds.json をリポジトリにコミット & プッシュ
-    run: |
-      git config user.name  "github-actions[bot]"
-      git config user.email "github-actions[bot]@users.noreply.github.com"
-      git add odds.json
-      # 差分がある場合のみコミット
-      git diff --staged --quiet || git commit -m "🏇 オッズ更新: ${{ github.event.inputs.race_id }} $(date +'%Y-%m-%d %H:%M JST' --date='9 hours')"
-      git push
-```
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add odds.json
+          git diff --staged --quiet || git commit -m "update odds"
+          git push
