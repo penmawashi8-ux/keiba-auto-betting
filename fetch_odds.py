@@ -1,23 +1,27 @@
-import requests,json,sys,os
+import requests,json,sys,os,re
 from datetime import datetime,timezone,timedelta
 JST=timezone(timedelta(hours=9))
 
 def fetch_horse_names(race_id,h,s):
-    url='https://race.netkeiba.com/api/api_get_jra_odds.html?race_id='+race_id+'&type=1&action=init'
+    url='https://race.sp.netkeiba.com/?pid=shutuba&race_id='+race_id
     try:
-        r=s.get(url,headers=h,timeout=15)
-        d=r.json()
+        r=s.get(url,headers=h,timeout=15,allow_redirects=True)
+        print('SHUTUBA_STATUS:'+str(r.status_code)+' LEN:'+str(len(r.text)))
         horses={}
-        raw=d.get('data',{}).get('horses',{})
-        for k,v in raw.items():
-            try:
-                n=int(k)
-                if isinstance(v,list) and len(v)>=2:
-                    horses[n]=v[1]
-                elif isinstance(v,dict):
-                    horses[n]=v.get('name',str(n))
-            except:
-                pass
+        rows=re.findall(r'<tr[^>]*class="[^"]*HorseList[^"]*"[^>]*>(.*?)</tr>',r.text,re.DOTALL|re.IGNORECASE)
+        print('ROWS:'+str(len(rows)))
+        for row in rows:
+            num_m=re.search(r'class="[^"]*Num[^"]*"[^>]*>.*?<span[^>]*>(\d+)</span>',row,re.DOTALL|re.IGNORECASE)
+            if not num_m:
+                num_m=re.search(r'<td[^>]*>(\d+)</td>',row,re.DOTALL)
+            name_m=re.search(r'class="[^"]*HorseName[^"]*"[^>]*>.*?<a[^>]*>([^<]+)</a>',row,re.DOTALL|re.IGNORECASE)
+            if num_m and name_m:
+                try:
+                    n=int(num_m.group(1))
+                    nm=name_m.group(1).strip()
+                    horses[n]=nm
+                except:
+                    pass
         print('NAMES:'+str(horses))
         return horses
     except Exception as e:
@@ -28,7 +32,7 @@ def fetch_odds(race_id):
     h={
         'User-Agent':'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120 Safari/537.36',
         'Referer':'https://race.netkeiba.com/',
-        'Accept':'application/json,*/*',
+        'Accept':'application/json,text/html,*/*',
         'Accept-Language':'ja-JP,ja;q=0.9',
     }
     s=requests.Session()
