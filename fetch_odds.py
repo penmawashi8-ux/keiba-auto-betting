@@ -6,7 +6,7 @@ def fetch_horse_names(race_id,h,s):
     url='https://race.sp.netkeiba.com/?pid=shutuba&race_id='+race_id
     try:
         r=s.get(url,headers=h,timeout=15,allow_redirects=True)
-        text=r.content.decode('utf-8','replace')
+        text=r.content.decode('euc-jp','replace')
         print('SHUTUBA_LEN:'+str(len(text)))
         horses={}
         matches=re.findall(r'(?:amp;)?i=(\d+)(?:&amp;|&)[^>]*rf=shutuba_modal[^>]*>\s*([^\s<][^<]+?)\s*</a>',text)
@@ -39,8 +39,7 @@ def fetch_odds(race_id):
     try:
         r=s.get(url,headers=h,timeout=15)
         print('STATUS:'+str(r.status_code))
-        d=r.content.decode('utf-8','replace')
-        d=json.loads(d)
+        d=r.json()
         odds_raw=d.get('data',{}).get('odds',{}).get('1',{})
         odds=[]
         for k,v in odds_raw.items():
