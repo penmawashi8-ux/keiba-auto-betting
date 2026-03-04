@@ -1,37 +1,37 @@
 {
   "race_id": "202506050811",
-  "fetched_at": "2026-03-04T21:33:14.486530+09:00",
+  "fetched_at": "2026-03-04T22:01:40.775813+09:00",
   "status": "ok",
   "count": 16,
   "odds": [
     {
       "horse_num": 5,
-      "horse_name": "�ᥤ���祦���Х�",
+      "horse_name": "\ufffd\u1964\ufffd\ufffd\ufffd\u7966\ufffd\ufffd\ufffd\u0425\ufffd",
       "odds": 3.3
     },
     {
       "horse_num": 4,
-      "horse_name": "�쥬�쥤��",
+      "horse_name": "\ufffd\uc96c\ufffd\uc964\ufffd\ufffd",
       "odds": 3.8
     },
     {
       "horse_num": 9,
-      "horse_name": "�����⥭�����",
+      "horse_name": "\ufffd\ufffd\ufffd\ufffd\ufffd\u296d\ufffd\ufffd\ufffd\ufffd\ufffd",
       "odds": 3.8
     },
     {
       "horse_num": 6,
-      "horse_name": "����饤�����ѥ�",
+      "horse_name": "\ufffd\ufffd\ufffd\ufffd\u9964\ufffd\ufffd\ufffd\ufffd\ufffd\u0465\ufffd",
       "odds": 5.8
     },
     {
       "horse_num": 3,
-      "horse_name": "�ߥ塼������ޥ���",
+      "horse_name": "\ufffd\u07e5\u587c\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u07a5\ufffd\ufffd\ufffd",
       "odds": 12.7
     },
     {
       "horse_num": 2,
-      "horse_name": "���㥹�ƥ���ѥ쥹",
+      "horse_name": "\ufffd\ufffd\ufffd\u3979\ufffd\u01a5\ufffd\ufffd\ufffd\u0465\uc979",
       "odds": 26.6
     },
     {
@@ -46,42 +46,42 @@
     },
     {
       "horse_num": 13,
-      "horse_name": "���饿",
+      "horse_name": "\ufffd\ufffd\ufffd\u997f",
       "odds": 50.3
     },
     {
       "horse_num": 11,
-      "horse_name": "�ޥ��ͥ륨��ڥ顼",
+      "horse_name": "\ufffd\u07a5\ufffd\ufffd\u0365\ub968\ufffd\ufffd\u06a5\u987c",
       "odds": 53.5
     },
     {
       "horse_num": 10,
-      "horse_name": "�ߥ��ƥ꡼������",
+      "horse_name": "\ufffd\u07e5\ufffd\ufffd\u01a5\ua87c\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd",
       "odds": 111.5
     },
     {
       "horse_num": 12,
-      "horse_name": "���ɥޥ���ƥ�",
+      "horse_name": "\ufffd\ufffd\ufffd\u0265\u07a5\ufffd\ufffd\ufffd\u01a5\ufffd",
       "odds": 111.5
     },
     {
       "horse_num": 7,
-      "horse_name": "��������ꥨ������",
+      "horse_name": "\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ua968\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd",
       "odds": 122.5
     },
     {
       "horse_num": 8,
-      "horse_name": "���Υ�ǥ�����",
+      "horse_name": "\ufffd\ufffd\ufffd\u03a5\ufffd\u01e5\ufffd\ufffd\ufffd\ufffd\ufffd",
       "odds": 154.1
     },
     {
       "horse_num": 14,
-      "horse_name": "����ȥ�Х�����",
+      "horse_name": "\ufffd\ufffd\ufffd\ufffd\u0225\ufffd\u0425\ufffd\ufffd\ufffd\ufffd\ufffd",
       "odds": 174.2
     },
     {
       "horse_num": 15,
-      "horse_name": "�����ƥ�������",
+      "horse_name": "\ufffd\ufffd\ufffd\ufffd\ufffd\u01a5\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd",
       "odds": 180.3
     }
   ]
