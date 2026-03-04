@@ -1,37 +1,37 @@
 {
   "race_id": "202506050811",
-  "fetched_at": "2026-03-04T22:27:43.942201+09:00",
+  "fetched_at": "2026-03-04T22:38:53.906329+09:00",
   "status": "ok",
   "count": 16,
   "odds": [
     {
       "horse_num": 5,
-      "horse_name": "�ᥤ���祦���Х�",
+      "horse_name": "メイショウタバル",
       "odds": 3.3
     },
     {
       "horse_num": 4,
-      "horse_name": "�쥬�쥤��",
+      "horse_name": "レガレイラ",
       "odds": 3.8
     },
     {
       "horse_num": 9,
-      "horse_name": "�����⥭�����",
+      "horse_name": "コスモキュランダ",
       "odds": 3.8
     },
     {
       "horse_num": 6,
-      "horse_name": "����饤�����ѥ�",
+      "horse_name": "サンライズジパング",
       "odds": 5.8
     },
     {
       "horse_num": 3,
-      "horse_name": "�ߥ塼������ޥ���",
+      "horse_name": "ミュージアムマイル",
       "odds": 12.7
     },
     {
       "horse_num": 2,
-      "horse_name": "���㥹�ƥ���ѥ쥹",
+      "horse_name": "ジャスティンパレス",
       "odds": 26.6
     },
     {
@@ -46,42 +46,42 @@
     },
     {
       "horse_num": 13,
-      "horse_name": "���饿",
+      "horse_name": "アラタ",
       "odds": 50.3
     },
     {
       "horse_num": 11,
-      "horse_name": "�ޥ��ͥ륨��ڥ顼",
+      "horse_name": "マイネルエンペラー",
       "odds": 53.5
     },
     {
       "horse_num": 10,
-      "horse_name": "�ߥ��ƥ꡼������",
+      "horse_name": "ミステリーウェイ",
       "odds": 111.5
     },
     {
       "horse_num": 12,
-      "horse_name": "���ɥޥ���ƥ�",
+      "horse_name": "アドマイヤテラ",
       "odds": 111.5
     },
     {
       "horse_num": 7,
-      "horse_name": "��������ꥨ������",
+      "horse_name": "シュヴァリエローズ",
       "odds": 122.5
     },
     {
       "horse_num": 8,
-      "horse_name": "���Υ�ǥ�����",
+      "horse_name": "ダノンデサイル",
       "odds": 154.1
     },
     {
       "horse_num": 14,
-      "horse_name": "����ȥ�Х�����",
+      "horse_name": "エルトンバローズ",
       "odds": 174.2
     },
     {
       "horse_num": 15,
-      "horse_name": "�����ƥ�������",
+      "horse_name": "タスティエーラ",
       "odds": 180.3
     }
   ]
