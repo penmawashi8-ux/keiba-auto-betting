@@ -8,7 +8,7 @@ def fetch_horse_names(race_id,h,s):
         r=s.get(url,headers=h,timeout=15,allow_redirects=True)
         print('SHUTUBA_LEN:'+str(len(r.text)))
         horses={}
-        matches=re.findall(r'shutuba_modal[^>]*[?&;]i=(\d+)[^>]*>\s*([^<\s][^<]*?)\s*</a>',r.text)
+        matches=re.findall(r'(?:amp;)?i=(\d+)(?:&amp;|&)[^>]*rf=shutuba_modal[^>]*>\s*([^\s<][^<]+?)\s*</a>',r.text)
         print('MATCHES:'+str(matches[:5]))
         for m in matches:
             try:
