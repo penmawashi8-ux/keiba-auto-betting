@@ -3,17 +3,20 @@ from datetime import datetime,timezone,timedelta
 JST=timezone(timedelta(hours=9))
 
 def fetch_horse_names(race_id,h,s):
-    url='https://race.netkeiba.com/race/shutuba.html?race_id='+race_id
+    url='https://race.sp.netkeiba.com/?pid=shutuba&race_id='+race_id
     try:
         r=s.get(url,headers=h,timeout=15,allow_redirects=True)
         text=r.content.decode('euc-jp','replace')
         print('SHUTUBA_LEN:'+str(len(text)))
-        unos=re.findall(r'<span id="uno-1_(\d+)">(\d+)</span>',text)
-        nms=re.findall(r'<span id="name-1_(\d+)">([^<]+)</span>',text)
-        uno_map={idx:num for idx,num in unos}
-        name_map={idx:nm for idx,nm in nms}
-        horses={int(uno_map[i]):name_map[i] for i in uno_map if i in name_map}
+        blocks=re.findall(r'<tr class="HorseList"[^>]*>(.*?)</tr>',text,re.DOTALL)
+        horses={}
+        for block in blocks:
+            waku=re.search(r'<td class="Waku\d+">(\d+)</td>',block)
+            name=re.search(r'rf=shutuba_modal[^>]*>\s*(?:<[^>]+>)*\s*([^\s<][^<]+?)\s*</a>',block)
+            if waku and name:
+                horses[int(waku.group(1))]=name.group(1).strip()
         print('NAMES_COUNT:'+str(len(horses)))
+        print('SAMPLE:'+str(list(horses.items())[:3]))
         return horses
     except Exception as e:
         print('NAMES_ERR:'+str(e))
@@ -21,7 +24,7 @@ def fetch_horse_names(race_id,h,s):
 
 def fetch_odds(race_id):
     h={
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
+        'User-Agent':'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120 Safari/537.36',
         'Referer':'https://race.netkeiba.com/',
         'Accept':'application/json,text/html,*/*',
         'Accept-Language':'ja-JP,ja;q=0.9',
