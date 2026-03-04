@@ -68,7 +68,7 @@ def main():
     if not odds:
         result['error']='no odds found'
     with open('odds.json','w',encoding='utf-8') as f:
-        json.dump(result,f,ensure_ascii=False,indent=2)
+        json.dump(result,f,ensure_ascii=True,indent=2)
     print('DONE:'+str(len(odds))+' entries written')
     if not odds:
         sys.exit(1)
