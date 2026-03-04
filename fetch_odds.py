@@ -40,22 +40,28 @@ def parse(html):
                     f=float(str(v).replace(',',''))
                     if 1<=n<=18 and 1.0<=f<9999:
                         odds.append({'horse_num':n,'horse_name':str(n),'odds':f})
-                except:pass
+                except:
+                    pass
             if odds:
                 odds.sort(key=lambda x:x['odds'])
                 return odds
-        except:pass
-
+        except:
+            pass
     rows=re.findall(r'<tr[^>]*>(.*?)</tr>',html,re.DOTALL|re.IGNORECASE)
     for row in rows:
         cells=re.findall(r'<td[^>]*>(.*?)</td>',row,re.DOTALL|re.IGNORECASE)
-        if len(cells)<3:continue
+        if len(cells)<3:
+            continue
         cl=[re.sub(r'<[^>]+>','',c).strip() for c in cells]
         cl=[x for x in cl if x]
-        if not cl:continue
-        try:n=int(cl[0])
-        except:continue
-        if not(1<=n<=18):continue
+        if not cl:
+            continue
+        try:
+            n=int(cl[0])
+        except:
+            continue
+        if not(1<=n<=18):
+            continue
         ov=None
         nm=str(n)
         for v in cl[1:]:
@@ -69,7 +75,6 @@ def parse(html):
                     nm=v
         if ov:
             odds.append({'horse_num':n,'horse_name':nm,'odds':ov})
-
     seen=set()
     res=[]
     for o in odds:
@@ -81,13 +86,20 @@ def parse(html):
 
 def main():
     race_id=sys.argv[1] if len(sys.argv)>=2 else os.environ.get('RACE_ID','')
-    if not race_id:sys.exit(1)
+    if not race_id:
+        sys.exit(1)
     print('RACEID:'+race_id)
     odds=fetch_odds(race_id)
-    result={'race_id':race_id,'fetched_at":datetime.now(JST).isoformat(),'status':'ok' if odds else 'error','count':len(odds),'odds':odds}
-    if not odds:result['error']='no odds found'
-    with open('odds.json','w',encoding='utf-8') as f:json.dump(result,f,ensure_ascii=False,indent=2)
+    at=datetime.now(JST).isoformat()
+    st='ok' if odds else 'error'
+    result={'race_id':race_id,'fetched_at':at,'status':st,'count':len(odds),'odds':odds}
+    if not odds:
+        result['error']='no odds found'
+    with open('odds.json','w',encoding='utf-8') as f:
+        json.dump(result,f,ensure_ascii=False,indent=2)
     print('DONE:'+str(len(odds))+' entries written')
-    if not odds:sys.exit(1)
+    if not odds:
+        sys.exit(1)
 
-if __name__=='__main__':main()
+if __name__=='__main__':
+    main()
