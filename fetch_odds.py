@@ -1,88 +1,37 @@
-import requests,json,re,sys,os
+import requests,json,sys,os
 from datetime import datetime,timezone,timedelta
 JST=timezone(timedelta(hours=9))
 
 def fetch_odds(race_id):
     h={
         'User-Agent':'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120 Safari/537.36',
-        'Referer':'https://race.sp.netkeiba.com/',
-        'Accept':'text/html,application/xhtml+xml,*/*',
+        'Referer':'https://race.netkeiba.com/',
+        'Accept':'application/json,*/*',
         'Accept-Language':'ja-JP,ja;q=0.9',
     }
-    s=requests.Session()
-    urls=[
-        'https://race.sp.netkeiba.com/?pid=odds_view&race_id='+race_id+'&type=b1',
-        'https://race.netkeiba.com/odds/index.html?race_id='+race_id+'&type=b1',
-    ]
-    for url in urls:
-        print('TRY:'+url)
-        try:
-            r=s.get(url,headers=h,timeout=15,allow_redirects=True)
-            print('STATUS:'+str(r.status_code)+' LEN:'+str(len(r.text)))
-            o=parse(r.text)
-            if o:
-                print('PARSED:'+str(len(o)))
-                return o
-            print('PARSE:0')
-        except Exception as e:
-            print('ERR:'+str(e))
-    return []
-
-def parse(html):
-    odds=[]
-    m=re.search(r'OddsWin\s*=\s*(\{.*?\})\s*;',html,re.DOTALL)
-    if m:
-        try:
-            d=json.loads(m.group(1))
-            for k,v in d.items():
-                try:
-                    n=int(k)
-                    f=float(str(v).replace(',',''))
-                    if 1<=n<=18 and 1.0<=f<9999:
-                        odds.append({'horse_num':n,'horse_name':str(n),'odds':f})
-                except:
-                    pass
-            if odds:
-                odds.sort(key=lambda x:x['odds'])
-                return odds
-        except:
-            pass
-    rows=re.findall(r'<tr[^>]*>(.*?)</tr>',html,re.DOTALL|re.IGNORECASE)
-    for row in rows:
-        cells=re.findall(r'<td[^>]*>(.*?)</td>',row,re.DOTALL|re.IGNORECASE)
-        if len(cells)<3:
-            continue
-        cl=[re.sub(r'<[^>]+>','',c).strip() for c in cells]
-        cl=[x for x in cl if x]
-        if not cl:
-            continue
-        try:
-            n=int(cl[0])
-        except:
-            continue
-        if not(1<=n<=18):
-            continue
-        ov=None
-        nm=str(n)
-        for v in cl[1:]:
-            v2=v.replace(',','')
+    url='https://race.netkeiba.com/api/api_get_jra_odds.html?race_id='+race_id+'&type=1&action=update'
+    print('TRY:'+url)
+    try:
+        r=requests.get(url,headers=h,timeout=15)
+        print('STATUS:'+str(r.status_code))
+        d=r.json()
+        print('STATUS_FIELD:'+str(d.get('status','')))
+        odds_raw=d.get('data',{}).get('odds',{}).get('1',{})
+        print('ODDS_KEYS:'+str(list(odds_raw.keys())[:5]))
+        odds=[]
+        for k,v in odds_raw.items():
             try:
-                f=float(v2)
-                if 1.0<=f<9999 and '.' in v2:
-                    ov=f
+                n=int(k)
+                ov=float(v[0])
+                odds.append({'horse_num':n,'horse_name':str(n),'odds':ov})
             except:
-                if 2<=len(v)<=20 and not re.match(r'^\d',v) and v not in ['---.-','--']:
-                    nm=v
-        if ov:
-            odds.append({'horse_num':n,'horse_name':nm,'odds':ov})
-    seen=set()
-    res=[]
-    for o in odds:
-        if o['horse_num'] not in seen:
-            seen.add(o['horse_num'])
-            res.append(o)
-    res.sort(key=lambda x:x['odds'])
-    return res
+                pass
+        odds.sort(key=lambda x:x['odds'])
+        print('PARSED:'+str(len(odds)))
+        return odds
+    except Exception as e:
+        print('ERR:'+str(e))
+    return []
 
 def main():
     race_id=sys.argv[1] if len(sys.argv)>=2 else os.environ.get('RACE_ID','')
