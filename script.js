@@ -64,7 +64,9 @@ async function loadOddsJson(expectedRaceId) {
     if (!res.ok) {
         throw new Error('odds.jsonが見つかりません。GitHub Actionsを先に実行してください（HTTP ' + res.status + '）');
     }
-    var data = await res.json();
+    var text = await res.text();
+    var decoder = new TextDecoder('utf-8');
+    var data = JSON.parse(text);
     console.log('odds.json:', data);
 
     if (data.status !== 'ok') {
