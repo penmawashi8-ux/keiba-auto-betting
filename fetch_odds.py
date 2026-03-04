@@ -2,6 +2,28 @@ import requests,json,sys,os
 from datetime import datetime,timezone,timedelta
 JST=timezone(timedelta(hours=9))
 
+def fetch_horse_names(race_id,h,s):
+    url='https://race.netkeiba.com/api/api_get_jra_odds.html?race_id='+race_id+'&type=1&action=init'
+    try:
+        r=s.get(url,headers=h,timeout=15)
+        d=r.json()
+        horses={}
+        raw=d.get('data',{}).get('horses',{})
+        for k,v in raw.items():
+            try:
+                n=int(k)
+                if isinstance(v,list) and len(v)>=2:
+                    horses[n]=v[1]
+                elif isinstance(v,dict):
+                    horses[n]=v.get('name',str(n))
+            except:
+                pass
+        print('NAMES:'+str(horses))
+        return horses
+    except Exception as e:
+        print('NAMES_ERR:'+str(e))
+        return {}
+
 def fetch_odds(race_id):
     h={
         'User-Agent':'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120 Safari/537.36',
@@ -9,21 +31,22 @@ def fetch_odds(race_id):
         'Accept':'application/json,*/*',
         'Accept-Language':'ja-JP,ja;q=0.9',
     }
+    s=requests.Session()
+    names=fetch_horse_names(race_id,h,s)
     url='https://race.netkeiba.com/api/api_get_jra_odds.html?race_id='+race_id+'&type=1&action=update'
     print('TRY:'+url)
     try:
-        r=requests.get(url,headers=h,timeout=15)
+        r=s.get(url,headers=h,timeout=15)
         print('STATUS:'+str(r.status_code))
         d=r.json()
-        print('STATUS_FIELD:'+str(d.get('status','')))
         odds_raw=d.get('data',{}).get('odds',{}).get('1',{})
-        print('ODDS_KEYS:'+str(list(odds_raw.keys())[:5]))
         odds=[]
         for k,v in odds_raw.items():
             try:
                 n=int(k)
                 ov=float(v[0])
-                odds.append({'horse_num':n,'horse_name':str(n),'odds':ov})
+                nm=names.get(n,str(n))
+                odds.append({'horse_num':n,'horse_name':nm,'odds':ov})
             except:
                 pass
         odds.sort(key=lambda x:x['odds'])
