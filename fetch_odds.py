@@ -6,10 +6,11 @@ def fetch_horse_names(race_id,h,s):
     url='https://race.sp.netkeiba.com/?pid=shutuba&race_id='+race_id
     try:
         r=s.get(url,headers=h,timeout=15,allow_redirects=True)
-        print('SHUTUBA_LEN:'+str(len(r.text)))
+        text=r.content.decode('utf-8','replace')
+        print('SHUTUBA_LEN:'+str(len(text)))
         horses={}
-        matches=re.findall(r'(?:amp;)?i=(\d+)(?:&amp;|&)[^>]*rf=shutuba_modal[^>]*>\s*([^\s<][^<]+?)\s*</a>',r.text)
-        print('MATCHES:'+str(matches[:5]))
+        matches=re.findall(r'(?:amp;)?i=(\d+)(?:&amp;|&)[^>]*rf=shutuba_modal[^>]*>\s*([^\s<][^<]+?)\s*</a>',text)
+        print('MATCHES:'+str(len(matches)))
         for m in matches:
             try:
                 n=int(m[0])
@@ -18,7 +19,7 @@ def fetch_horse_names(race_id,h,s):
                     horses[n]=nm
             except:
                 pass
-        print('NAMES:'+str(horses))
+        print('NAMES_COUNT:'+str(len(horses)))
         return horses
     except Exception as e:
         print('NAMES_ERR:'+str(e))
@@ -38,7 +39,8 @@ def fetch_odds(race_id):
     try:
         r=s.get(url,headers=h,timeout=15)
         print('STATUS:'+str(r.status_code))
-        d=r.json()
+        d=r.content.decode('utf-8','replace')
+        d=json.loads(d)
         odds_raw=d.get('data',{}).get('odds',{}).get('1',{})
         odds=[]
         for k,v in odds_raw.items():
@@ -68,7 +70,7 @@ def main():
     if not odds:
         result['error']='no odds found'
     with open('odds.json','w',encoding='utf-8') as f:
-        json.dump(result,f,ensure_ascii=True,indent=2)
+        json.dump(result,f,ensure_ascii=False,indent=2)
     print('DONE:'+str(len(odds))+' entries written')
     if not odds:
         sys.exit(1)
