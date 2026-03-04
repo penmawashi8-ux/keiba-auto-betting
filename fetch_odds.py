@@ -6,22 +6,18 @@ def fetch_horse_names(race_id,h,s):
     url='https://race.sp.netkeiba.com/?pid=shutuba&race_id='+race_id
     try:
         r=s.get(url,headers=h,timeout=15,allow_redirects=True)
-        print('SHUTUBA_STATUS:'+str(r.status_code)+' LEN:'+str(len(r.text)))
+        print('SHUTUBA_LEN:'+str(len(r.text)))
         horses={}
-        rows=re.findall(r'<tr[^>]*class="[^"]*HorseList[^"]*"[^>]*>(.*?)</tr>',r.text,re.DOTALL|re.IGNORECASE)
-        print('ROWS:'+str(len(rows)))
-        for row in rows:
-            num_m=re.search(r'class="[^"]*Num[^"]*"[^>]*>.*?<span[^>]*>(\d+)</span>',row,re.DOTALL|re.IGNORECASE)
-            if not num_m:
-                num_m=re.search(r'<td[^>]*>(\d+)</td>',row,re.DOTALL)
-            name_m=re.search(r'class="[^"]*HorseName[^"]*"[^>]*>.*?<a[^>]*>([^<]+)</a>',row,re.DOTALL|re.IGNORECASE)
-            if num_m and name_m:
-                try:
-                    n=int(num_m.group(1))
-                    nm=name_m.group(1).strip()
+        matches=re.findall(r'shutuba_modal[^>]*[?&]i=(\d+)[^>]*>\s*([^<]+)</a>',r.text)
+        print('MATCHES:'+str(matches[:5]))
+        for m in matches:
+            try:
+                n=int(m[0])
+                nm=m[1].strip()
+                if nm and 1<=n<=18:
                     horses[n]=nm
-                except:
-                    pass
+            except:
+                pass
         print('NAMES:'+str(horses))
         return horses
     except Exception as e:
