@@ -1,3 +1,4 @@
+
 function getRaceId() {
   if (currentMode === 'direct') {
     return document.getElementById('raceIdDirect').value.trim();
