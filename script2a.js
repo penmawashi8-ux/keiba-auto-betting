@@ -119,3 +119,8 @@ return {num: parseInt(e[0]), odds: parseFloat(e[1][0]), popular: parseInt(e[1][2
 oddsArr.sort(function(a,b){ return a.popular - b.popular; });
 return oddsArr;
 }
+
+window.updatePreview = updatePreview;
+window.triggerActions = triggerActions;
+window.handleFetchOdds = handleFetchOdds;
+window.loadOddsJson = loadOddsJson;
