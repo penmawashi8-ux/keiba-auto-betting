@@ -63,8 +63,6 @@ jobs:
                       print(f'Fallback: {yyyymmdd} vc={vc} times={times} day={day} rid={rid}')
             except Exception as e:
               print(f'Error {yyyymmdd}: {e}')
-            data['race_id'] = race_id
-
           with open('kaisai.json', 'w') as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
           print('Done:', json.dumps(result, ensure_ascii=False))
@@ -86,6 +84,7 @@ jobs:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=10) as r:
               data = json.loads(r.read())
+data['race_id'] = race_id
               with open('odds.json', 'w') as f:
                 json.dump(data, f, ensure_ascii=False)
               print('odds.json saved')
