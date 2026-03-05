@@ -63,6 +63,7 @@ jobs:
                       print(f'Fallback: {yyyymmdd} vc={vc} times={times} day={day} rid={rid}')
             except Exception as e:
               print(f'Error {yyyymmdd}: {e}')
+            data['race_id'] = race_id
 
           with open('kaisai.json', 'w') as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
