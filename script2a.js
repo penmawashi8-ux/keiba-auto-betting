@@ -73,7 +73,7 @@ async function handleFetchOdds() {
       dataSource = 'DEMO data';
     }
 
-    var portfolio = calculatePortfolio(odds);
+    var portfolio = calculatePortfolio(odds,document.getElementById("budgetInput")&&document.getElementById("budgetInput").value,document.getElementById("countInput")&&document.getElementById("countInput").value);
     cachedPortfolio = portfolio;
 
     document.getElementById('dataSource').textContent = dataSource;
