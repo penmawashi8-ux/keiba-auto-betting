@@ -53,16 +53,19 @@ window.onDateOrVenueChange = async function() {
       document.getElementById('kaisaiInfo').style.color = '#2e7d32';
       window._kaisaiTimes = info.times;
       window._kaisaiDay = info.day;
+      window._kaisaiSampleId = info.sample_race_id || null;
     } else {
       document.getElementById('kaisaiInfo').textContent = '⚠️ この日は開催なし（またはkaisai.json未更新）';
       document.getElementById('kaisaiInfo').style.color = '#c62828';
       window._kaisaiTimes = null;
       window._kaisaiDay = null;
+      window._kaisaiSampleId = null;
     }
   } catch(e) {
     document.getElementById('kaisaiInfo').textContent = '⚠️ 検索エラー: ' + e.message;
     window._kaisaiTimes = null;
     window._kaisaiDay = null;
+    window._kaisaiSampleId = null;
   }
   window.updatePreview();
 };
