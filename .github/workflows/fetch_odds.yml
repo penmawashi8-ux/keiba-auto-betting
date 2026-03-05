@@ -29,23 +29,34 @@ jobs:
           result = {}
           for yyyymmdd in days_ahead:
             result[yyyymmdd] = {}
-            # SP版HTMLは静的レンダリング
             url = f'https://race.sp.netkeiba.com/?pid=race_list&kaisai_date={yyyymmdd}'
             try:
               req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)'})
               with urllib.request.urlopen(req, timeout=10) as r:
                 html = r.read().decode('utf-8', errors='ignore')
-              print(f'HTML length {yyyymmdd}: {len(html)}')
-              # race_idを抽出 (12桁数字)
               race_ids = re.findall(r'race_id=(\d{12})', html)
-              print(f'Found race_ids: {race_ids[:5]}')
-              for rid in race_ids:
-                vc = rid[4:6]
-                times = rid[6:8]
-                day = rid[8:10]
-                if vc not in result[yyyymmdd]:
-                  result[yyyymmdd][vc] = {'times': times, 'day': day}
-                  print(f'Found: {yyyymmdd} vc={vc} times={times} day={day}')
+              # その日付のレースのみ採用するため、kaisai_dateから年月日を取得
+              # race_idの構造: yyyy(4)+venue(2)+times(2)+day(2)+R(2)
+              # kaisai_dateとrace_idは別物ななで、HTMLに含まれるkaisai_date属性を探す
+              # 例: data-kaisai_date="20260301" の近くにあるrace_id
+              # より確実な方法: race_idの前後のhtmlからkaisai_dateを対応させる
+              blocks = re.findall(r'kaisai_date[="\s:]+(\d{8})[^<]*race_id[="\s:]+(\d{12})|race_id[="\s:]+(\d{12})[^<]*kaisai_date[="\s:]+(\d{8})', html)
+              print(f'{yyyymmdd} blocks: {blocks[:3]}')
+              
+              # blockが取れない場合はrace_idとkaisai_dateを別々に抽出して対応
+              # HTMLをkaisai_dateブロックで分割
+              parts = re.split(r'kaisai_date[="\s]+(\d{8})', html)
+              for i in range(1, len(parts), 2):
+                kdate = parts[i]
+                block = parts[i+1] if i+1 < len(parts) else ''
+                rids = re.findall(r'race_id=(\d{12})', block[:2000])
+                for rid in rids:
+                  vc = rid[4:6]
+                  times = rid[6:8]
+                  day = rid[8:10]
+                  if kdate == yyyymmdd and vc not in result[yyyymmdd]:
+                    result[yyyymmdd][vc] = {'times': times, 'day': day}
+                    print(f'Found: {yyyymmdd} vc={vc} times={times} day={day}')
             except Exception as e:
               print(f'Error {yyyymmdd}: {e}')
 
