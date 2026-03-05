@@ -5,10 +5,6 @@ var VENUE_CODES = {
   '01':'札幌','02':'函館','03':'福島','04':'新潟','05':'東京',
   '06':'中山','07':'中京','08':'京都','09':'阪神','10':'小倉'
 };
-var VENUE_NAMES_REV = {
-  '札幌':'01','函館':'02','福島':'03','新潟':'04','東京':'05',
-  '中山':'06','中京':'07','京都':'08','阪神':'09','小倉':'10'
-};
 
 document.addEventListener('DOMContentLoaded', function() {
   var today = new Date();
@@ -48,14 +44,17 @@ window.onDateOrVenueChange = async function() {
 
   document.getElementById('kaisaiInfo').textContent = '⏳ 検索中...';
   try {
-    var info = await window.fetchKaisaiInfo(date, venueCode);
-    if (info) {
+    var yyyymmdd = date.replace(/-/g, '');
+    var res = await fetch('kaisai.json?t='+Date.now());
+    var kaisai = await res.json();
+    if (kaisai[yyyymmdd] && kaisai[yyyymmdd][venueCode]) {
+      var info = kaisai[yyyymmdd][venueCode];
       document.getElementById('kaisaiInfo').textContent = '✅ ' + info.times + '回' + VENUE_CODES[venueCode] + info.day + '日目';
       document.getElementById('kaisaiInfo').style.color = '#2e7d32';
       window._kaisaiTimes = info.times;
       window._kaisaiDay = info.day;
     } else {
-      document.getElementById('kaisaiInfo').textContent = '⚠️ この日は開催なし';
+      document.getElementById('kaisaiInfo').textContent = '⚠️ この日は開催なし（またはkaisai.json未更新）';
       document.getElementById('kaisaiInfo').style.color = '#c62828';
       window._kaisaiTimes = null;
       window._kaisaiDay = null;
@@ -66,25 +65,4 @@ window.onDateOrVenueChange = async function() {
     window._kaisaiDay = null;
   }
   window.updatePreview();
-};
-
-window.fetchKaisaiInfo = async function(date, venueCode) {
-  var yyyymmdd = date.replace(/-/g, '');
-  for (var times = 1; times <= 6; times++) {
-    for (var day = 1; day <= 12; day++) {
-      var rid = yyyymmdd.slice(0,4) + venueCode + String(times).padStart(2,'0') + String(day).padStart(2,'0') + '01';
-      try {
-        var res = await fetch('https://race.netkeiba.com/api/api_get_jra_odds.html?race_id='+rid+'&type=1&action=update', {
-          signal: AbortSignal.timeout(3000)
-        });
-        if (res.ok) {
-          var data = await res.json();
-          if (data && data.data && data.data.odds && Object.keys(data.data.odds['1'] || {}).length > 0) {
-            return {times: String(times).padStart(2,'0'), day: String(day).padStart(2,'0')};
-          }
-        }
-      } catch(e) {}
-    }
-  }
-  return null;
 };
