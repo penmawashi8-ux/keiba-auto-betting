@@ -18,6 +18,7 @@ jobs:
         run: |
           python3 << 'PYEOF'
           import urllib.request, json, datetime
+          from concurrent.futures import ThreadPoolExecutor, as_completed
 
           VENUE_CODES = ['01','02','03','04','05','06','07','08','09','10']
           today = datetime.date.today()
@@ -27,33 +28,44 @@ jobs:
             if d.weekday() in [5, 6]:
               days_ahead.append(d.strftime('%Y%m%d'))
 
+          def check_race(yyyymmdd, vc, times, day):
+            rid = yyyymmdd[:4] + vc + str(times).zfill(2) + str(day).zfill(2) + '01'
+            url = f'https://race.netkeiba.com/api/api_get_jra_odds.html?race_id={rid}&type=1&action=update'
+            try:
+              req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+              with urllib.request.urlopen(req, timeout=5) as r:
+                data = json.loads(r.read())
+                if data and data.get('data'):
+                  odds = data['data'].get('odds', {})
+                  # 単勝オッズが実際に存在するか確認
+                  if odds and len(odds.get('1', {})) > 0:
+                    return (yyyymmdd, vc, times, day)
+            except:
+              pass
+            return None
+
           result = {}
           for yyyymmdd in days_ahead:
             result[yyyymmdd] = {}
+
+          # 並列で全組み合わせをチェック
+          tasks = []
+          for yyyymmdd in days_ahead:
             for vc in VENUE_CODES:
-              found = False
               for times in range(1, 7):
-                if found: break
                 for day in range(1, 13):
-                  rid = yyyymmdd[:4] + vc + str(times).zfill(2) + str(day).zfill(2) + '01'
-                  url = f'https://race.netkeiba.com/api/api_get_jra_odds.html?race_id={rid}&type=1&action=update'
-                  try:
-                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-                    with urllib.request.urlopen(req, timeout=5) as r:
-                      data = json.loads(r.read())
-                      # オッズがなくてもレース自体が存在すればOK（data.dataがあればOK）
-                      if data and data.get('data') is not None:
-                        d_data = data['data']
-                        # オッズあり or レース情報だけあってもOK
-                        has_odds = d_data.get('odds') and len(d_data['odds'].get('1', {})) > 0
-                        has_race = d_data.get('race_id') or d_data.get('RaceInfo')
-                        if has_odds or has_race:
-                          result[yyyymmdd][vc] = {'times': str(times).zfill(2), 'day': str(day).zfill(2)}
-                          print(f'Found: {yyyymmdd} vc={vc} times={times} day={day}')
-                          found = True
-                          break
-                  except Exception as e:
-                    pass
+                  tasks.append((yyyymmdd, vc, times, day))
+
+          with ThreadPoolExecutor(max_workers=20) as ex:
+            futures = {ex.submit(check_race, *t): t for t in tasks}
+            for f in as_completed(futures):
+              r = f.result()
+              if r:
+                yyyymmdd, vc, times, day = r
+                # 同じ日・会場で既に見つかっていたら小さい方を採用
+                if vc not in result[yyyymmdd]:
+                  result[yyyymmdd][vc] = {'times': str(times).zfill(2), 'day': str(day).zfill(2)}
+                  print(f'Found: {yyyymmdd} vc={vc} times={times} day={day}')
 
           with open('kaisai.json', 'w') as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
