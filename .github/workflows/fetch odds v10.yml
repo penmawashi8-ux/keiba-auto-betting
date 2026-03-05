@@ -1,0 +1,102 @@
+name: Fetch Odds
+
+on:
+  workflow_dispatch:
+    inputs:
+      race_id:
+        description: 'Race ID (12 digits)'
+        required: true
+
+jobs:
+  fetch-kaisai:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch kaisai info and save JSON
+        run: |
+          python3 << 'PYEOF'
+          import urllib.request, json, datetime, re
+
+          today = datetime.date.today()
+          days_ahead = []
+          for i in range(-7, 14):
+            d = today + datetime.timedelta(days=i)
+            if d.weekday() in [5, 6]:
+              days_ahead.append(d.strftime('%Y%m%d'))
+
+          result = {}
+          for yyyymmdd in days_ahead:
+            result[yyyymmdd] = {}
+            url = f'https://race.sp.netkeiba.com/?pid=race_list&kaisai_date={yyyymmdd}'
+            try:
+              req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)'})
+              with urllib.request.urlopen(req, timeout=10) as r:
+                html = r.read().decode('utf-8', errors='ignore')
+              race_ids = re.findall(r'race_id=(\d{12})', html)
+              yyyy = yyyymmdd[:4]
+              # その日付のリンク近辺のrace_idを探す
+              # HTMLをyyyymmddで分割して対応するブロックのrace_idを使う
+              idx = html.find(yyyymmdd)
+              if idx >= 0:
+                block = html[idx:idx+5000]
+                block_ids = re.findall(r'race_id=(\d{12})', block)
+                for rid in block_ids:
+                  if rid[:4] == yyyy:
+                    vc = rid[4:6]
+                    times = rid[6:8]
+                    day = rid[8:10]
+                    if vc not in result[yyyymmdd]:
+                      result[yyyymmdd][vc] = {'times': times, 'day': day, 'sample_race_id': rid}
+                      print(f'Found: {yyyymmdd} vc={vc} times={times} day={day} rid={rid}')
+              else:
+                print(f'Date {yyyymmdd} not found in HTML')
+                # fallback: 全race_idから年が一致するものを使用
+                for rid in race_ids:
+                  if rid[:4] == yyyy:
+                    vc = rid[4:6]
+                    times = rid[6:8]
+                    day = rid[8:10]
+                    if vc not in result[yyyymmdd]:
+                      result[yyyymmdd][vc] = {'times': times, 'day': day, 'sample_race_id': rid}
+                      print(f'Fallback: {yyyymmdd} vc={vc} times={times} day={day} rid={rid}')
+            except Exception as e:
+              print(f'Error {yyyymmdd}: {e}')
+
+          with open('kaisai.json', 'w') as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
+          print('Done:', json.dumps(result, ensure_ascii=False))
+          PYEOF
+      - name: Fetch odds for race
+        env:
+          RACE_ID: ${{ github.event.inputs.race_id }}
+        run: |
+          python3 << 'PYEOF'
+          import urllib.request, json, os
+
+          race_id = os.environ.get('RACE_ID', '')
+          if not race_id or len(race_id) != 12:
+            print('Invalid race_id:', race_id)
+            exit(0)
+
+          url = f'https://race.netkeiba.com/api/api_get_jra_odds.html?race_id={race_id}&type=1&action=update'
+          try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=10) as r:
+              data = json.loads(r.read())
+              with open('odds.json', 'w') as f:
+                json.dump(data, f, ensure_ascii=False)
+              print('odds.json saved')
+          except Exception as e:
+            print('Error:', e)
+            with open('odds.json', 'w') as f:
+              json.dump({'error': str(e)}, f)
+          PYEOF
+      - name: Commit files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add kaisai.json odds.json
+          git diff --staged --quiet || git commit -m "update odds and kaisai"
+          git push
