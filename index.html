@@ -16,6 +16,7 @@ body { font-family: -apple-system, sans-serif; background: #f5f5f5; color: #333;
 .row label { font-size: 13px; color: #555; margin-bottom: 4px; display: block; }
 .row > div { flex: 1; }
 select, input[type=text], input[type=date] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: white; }
+.kaisai-info { font-size: 13px; padding: 8px 10px; border-radius: 8px; background: #f5f5f5; margin-bottom: 8px; min-height: 36px; }
 .race-id-display { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 10px; font-size: 13px; color: #2e7d32; text-align: center; margin-bottom: 8px; font-family: monospace; }
 .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
 .btn-primary { background: linear-gradient(135deg, #1565c0, #1976d2); color: white; }
@@ -46,7 +47,6 @@ td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #f0f0f0; }
 </div>
 <div class="container">
   <div id="error"></div>
-
   <div class="card">
     <h2>📅 レース選択</h2>
     <div class="toggle-row">
@@ -60,8 +60,6 @@ td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #f0f0f0; }
           <label>📅 日付</label>
           <input type="date" id="raceDate">
         </div>
-      </div>
-      <div class="row">
         <div>
           <label>🏟 競馬場</label>
           <select id="raceVenue">
@@ -77,25 +75,8 @@ td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #f0f0f0; }
             <option value="10">小倉</option>
           </select>
         </div>
-        <div>
-          <label>🔄 回</label>
-          <select id="raceTimes">
-            <option value="01">1回</option>
-            <option value="02">2回</option>
-            <option value="03">3回</option>
-            <option value="04">4回</option>
-            <option value="05">5回</option>
-          </select>
-        </div>
-        <div>
-          <label>📆 日</label>
-          <select id="raceDay">
-            <option value="01">1日</option><option value="02">2日</option><option value="03">3日</option>
-            <option value="04">4日</option><option value="05">5日</option><option value="06">6日</option>
-            <option value="07">7日</option><option value="08" selected>8日</option>
-          </select>
-        </div>
       </div>
+      <div class="kaisai-info" id="kaisaiInfo">⏳ 開催情報を検索中...</div>
       <div class="row">
         <div>
           <label>🏁 レース番号</label>
