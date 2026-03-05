@@ -29,15 +29,17 @@ jobs:
           result = {}
           for yyyymmdd in days_ahead:
             result[yyyymmdd] = {}
-            url = f'https://race.netkeiba.com/top/race_list.html?kaisai_date={yyyymmdd}'
+            # SP版HTMLは静的レンダリング
+            url = f'https://race.sp.netkeiba.com/?pid=race_list&kaisai_date={yyyymmdd}'
             try:
-              req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+              req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)'})
               with urllib.request.urlopen(req, timeout=10) as r:
                 html = r.read().decode('utf-8', errors='ignore')
-              # race_idを全部抽出 (例: 202606020201)
+              print(f'HTML length {yyyymmdd}: {len(html)}')
+              # race_idを抽出 (12桁数字)
               race_ids = re.findall(r'race_id=(\d{12})', html)
+              print(f'Found race_ids: {race_ids[:5]}')
               for rid in race_ids:
-                yyyy = rid[0:4]
                 vc = rid[4:6]
                 times = rid[6:8]
                 day = rid[8:10]
