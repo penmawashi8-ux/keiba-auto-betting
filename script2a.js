@@ -113,7 +113,7 @@ async function loadOddsJson(expectedRaceId) {
     throw new Error('Odds empty');
   }
   var oddsArr = Object.entries(oddsObj).map(function(e) {
-    return {num: parseInt(e[0]), odds: parseFloat(e[1][0]), popular: parseInt(e[1][2])};
+    return {horse_num: parseInt(e[0]), horse_name: '', odds: parseFloat(e[1][0]), popular: parseInt(e[1][2])};
   }).filter(function(o) { return !isNaN(o.odds); });
   oddsArr.sort(function(a,b){ return a.popular - b.popular; });
   return oddsArr;
