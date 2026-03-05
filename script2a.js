@@ -1,76 +1,76 @@
 function getRaceId() {
-if (currentMode === âdirectâ) {
-return document.getElementById(âraceIdDirectâ).value.trim();
+if (currentMode === Ã¢ÂÂdirectÃ¢ÂÂ) {
+return document.getElementById(Ã¢ÂÂraceIdDirectÃ¢ÂÂ).value.trim();
 }
-var rnum = document.getElementById(âraceNumâ).value;
+var rnum = document.getElementById(Ã¢ÂÂraceNumÃ¢ÂÂ).value;
 if (window._kaisaiSampleId && window._kaisaiSampleId.length === 12) {
 return window._kaisaiSampleId.slice(0, 10) + rnum;
 }
-var date = document.getElementById(âraceDateâ).value.replace(/-/g,ââ);
-var venue = document.getElementById(âraceVenueâ).value;
+var date = document.getElementById(Ã¢ÂÂraceDateÃ¢ÂÂ).value.replace(/-/g,Ã¢ÂÂÃ¢ÂÂ);
+var venue = document.getElementById(Ã¢ÂÂraceVenueÃ¢ÂÂ).value;
 var times = window._kaisaiTimes;
 var day = window._kaisaiDay;
-if (!date || date.length !== 8 || !times || !day) return ââ;
+if (!date || date.length !== 8 || !times || !day) return Ã¢ÂÂÃ¢ÂÂ;
 return date.slice(0,4) + venue + times + day + rnum;
 }
 
 function updatePreview() {
 var rid = getRaceId();
-var preview = document.getElementById(âraceIdPreviewâ);
+var preview = document.getElementById(Ã¢ÂÂraceIdPreviewÃ¢ÂÂ);
 if (!preview) return;
 if (rid && rid.length === 12) {
-var venue = document.getElementById(âraceVenueâ).value;
-var rnum = document.getElementById(âraceNumâ).value;
+var venue = document.getElementById(Ã¢ÂÂraceVenueÃ¢ÂÂ).value;
+var rnum = document.getElementById(Ã¢ÂÂraceNumÃ¢ÂÂ).value;
 var vname = VENUE_CODES[venue] || venue;
-var date = document.getElementById(âraceDateâ).value;
-preview.textContent = ârace_id: â + rid + â\uFF08â + date + â â + vname + â â + parseInt(rnum) + âR\uFF09â;
-preview.style.background = â#e8f5e9â;
-preview.style.color = â#2e7d32â;
-} else if (currentMode === âsimpleâ) {
-preview.textContent = ârace_id: éå¬æå ±ãæ¤ç´¢ä¸­â¦â;
-preview.style.background = â#fff3e0â;
-preview.style.color = â#e65100â;
+var date = document.getElementById(Ã¢ÂÂraceDateÃ¢ÂÂ).value;
+preview.textContent = Ã¢ÂÂrace_id: Ã¢ÂÂ + rid + Ã¢ÂÂ\uFF08Ã¢ÂÂ + date + Ã¢ÂÂ Ã¢ÂÂ + vname + Ã¢ÂÂ Ã¢ÂÂ + parseInt(rnum) + Ã¢ÂÂR\uFF09Ã¢ÂÂ;
+preview.style.background = Ã¢ÂÂ#e8f5e9Ã¢ÂÂ;
+preview.style.color = Ã¢ÂÂ#2e7d32Ã¢ÂÂ;
+} else if (currentMode === Ã¢ÂÂsimpleÃ¢ÂÂ) {
+preview.textContent = Ã¢ÂÂrace_id: Ã©ÂÂÃ¥ÂÂ¬Ã¦ÂÂÃ¥Â Â±Ã£ÂÂÃ¦Â¤ÂÃ§Â´Â¢Ã¤Â¸Â­Ã¢ÂÂ¦Ã¢ÂÂ;
+preview.style.background = Ã¢ÂÂ#fff3e0Ã¢ÂÂ;
+preview.style.color = Ã¢ÂÂ#e65100Ã¢ÂÂ;
 }
 }
 
 function triggerActions() {
 var rid = getRaceId();
 if (!rid || rid.length !== 12) {
-showError(ârace_idãç¢ºèªã§ãã¾ãããéå¬æå ±ã®æ¤ç´¢å®äºããå¾ã¡ãã ããâ);
+showError(Ã¢ÂÂrace_idÃ£ÂÂÃ§Â¢ÂºÃ¨ÂªÂÃ£ÂÂ§Ã£ÂÂÃ£ÂÂ¾Ã£ÂÂÃ£ÂÂÃ£ÂÂÃ©ÂÂÃ¥ÂÂ¬Ã¦ÂÂÃ¥Â Â±Ã£ÂÂ®Ã¦Â¤ÂÃ§Â´Â¢Ã¥Â®ÂÃ¤ÂºÂÃ£ÂÂÃ£ÂÂÃ¥Â¾ÂÃ£ÂÂ¡Ã£ÂÂÃ£ÂÂ Ã£ÂÂÃ£ÂÂÃ¢ÂÂ);
 return;
 }
-var url = âhttps://github.com/penmawashi8-ux/keiba-auto-betting/actions/workflows/fetch_odds.ymlâ;
-alert(âGitHubã®Actionsãã¼ã¸ãéãã¾ãã\nãRun workflowãâ race_id: â + rid + â ã§å®è¡ãã¦ãã ããï¼â);
-window.open(url, â_blankâ);
+var url = Ã¢ÂÂhttps://github.com/penmawashi8-ux/keiba-auto-betting/actions/workflows/fetch_odds.ymlÃ¢ÂÂ;
+alert(Ã¢ÂÂGitHubÃ£ÂÂ®ActionsÃ£ÂÂÃ£ÂÂ¼Ã£ÂÂ¸Ã£ÂÂÃ©ÂÂÃ£ÂÂÃ£ÂÂ¾Ã£ÂÂÃ£ÂÂ\nÃ£ÂÂRun workflowÃ£ÂÂÃ¢ÂÂ race_id: Ã¢ÂÂ + rid + Ã¢ÂÂ Ã£ÂÂ§Ã¥Â®ÂÃ¨Â¡ÂÃ£ÂÂÃ£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£ÂÂÃ£ÂÂÃ¯Â¼ÂÃ¢ÂÂ);
+window.open(url, Ã¢ÂÂ_blankÃ¢ÂÂ);
 }
 
 async function handleFetchOdds() {
 var raceId = getRaceId();
 if (!raceId || raceId.length !== 12) {
-showError(ârace_idãç¢ºèªãã¦ãã ããï¼éå¬æå ±ã®æ¤ç´¢å®äºããå¾ã¡ãã ããï¼â);
+showError(Ã¢ÂÂrace_idÃ£ÂÂÃ§Â¢ÂºÃ¨ÂªÂÃ£ÂÂÃ£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£ÂÂÃ£ÂÂÃ¯Â¼ÂÃ©ÂÂÃ¥ÂÂ¬Ã¦ÂÂÃ¥Â Â±Ã£ÂÂ®Ã¦Â¤ÂÃ§Â´Â¢Ã¥Â®ÂÃ¤ÂºÂÃ£ÂÂÃ£ÂÂÃ¥Â¾ÂÃ£ÂÂ¡Ã£ÂÂÃ£ÂÂ Ã£ÂÂÃ£ÂÂÃ¯Â¼ÂÃ¢ÂÂ);
 return;
 }
 
 hideError();
 showLoading(true);
-document.getElementById(âoutputSectionâ).style.display = ânoneâ;
+document.getElementById(Ã¢ÂÂoutputSectionÃ¢ÂÂ).style.display = Ã¢ÂÂnoneÃ¢ÂÂ;
 
 var odds = null;
-var dataSource = ââ;
+var dataSource = Ã¢ÂÂÃ¢ÂÂ;
 
 try {
 try {
 odds = await loadOddsJson(raceId);
-dataSource = â\u2705 GitHub Actionsåå¾ãã¼ã¿ï¼odds.jsonï¼â;
+dataSource = Ã¢ÂÂ\u2705 GitHub ActionsÃ¥ÂÂÃ¥Â¾ÂÃ£ÂÂÃ£ÂÂ¼Ã£ÂÂ¿Ã¯Â¼Âodds.jsonÃ¯Â¼ÂÃ¢ÂÂ;
 } catch(e) {
-console.warn(âodds.jsonå¤±æ:â, e.message);
+console.warn(Ã¢ÂÂodds.jsonÃ¥Â¤Â±Ã¦ÂÂ:Ã¢ÂÂ, e.message);
 showError(e.message);
 }
 
 ```
 if (!odds || odds.length === 0) {
   odds = generateMockOdds();
-  dataSource = '\u26A0\uFE0F ãã¢ãã¼ã¿ï¼GitHub Actionsã§ãªããºJSONåå¾å¾ã«ååº¦æ¼ãã¦ãã ããï¼';
+  dataSource = '\u26A0\uFE0F Ã£ÂÂÃ£ÂÂ¢Ã£ÂÂÃ£ÂÂ¼Ã£ÂÂ¿Ã¯Â¼ÂGitHub ActionsÃ£ÂÂ§Ã£ÂÂªÃ£ÂÂÃ£ÂÂºJSONÃ¥ÂÂÃ¥Â¾ÂÃ¥Â¾ÂÃ£ÂÂ«Ã¥ÂÂÃ¥ÂºÂ¦Ã¦ÂÂ¼Ã£ÂÂÃ£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£ÂÂÃ£ÂÂÃ¯Â¼Â';
 }
 
 var portfolio = calculatePortfolio(odds);
@@ -90,28 +90,28 @@ document.getElementById('outputSection').style.display = 'block';
 ```
 
 } catch(err) {
-showError(âã¨ã©ã¼: â + err.message);
+showError(Ã¢ÂÂÃ£ÂÂ¨Ã£ÂÂ©Ã£ÂÂ¼: Ã¢ÂÂ + err.message);
 } finally {
 showLoading(false);
 }
 }
 
 async function loadOddsJson(expectedRaceId) {
-var url = âodds.json?t=â + Date.now();
+var url = Ã¢ÂÂodds.json?t=Ã¢ÂÂ + Date.now();
 var res = await fetch(url);
 if (!res.ok) {
-throw new Error(âodds.jsonãè¦ã¤ããã¾ãããåã«ãâ¡ GitHub Actionsã§ãªããºåå¾ããå®è¡ãã¦ãã ããï¼HTTP â + res.status + âï¼â);
+throw new Error(Ã¢ÂÂodds.jsonÃ£ÂÂÃ¨Â¦ÂÃ£ÂÂ¤Ã£ÂÂÃ£ÂÂÃ£ÂÂ¾Ã£ÂÂÃ£ÂÂÃ£ÂÂÃ¥ÂÂÃ£ÂÂ«Ã£ÂÂÃ¢ÂÂ¡ GitHub ActionsÃ£ÂÂ§Ã£ÂÂªÃ£ÂÂÃ£ÂÂºÃ¥ÂÂÃ¥Â¾ÂÃ£ÂÂÃ£ÂÂÃ¥Â®ÂÃ¨Â¡ÂÃ£ÂÂÃ£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£ÂÂÃ£ÂÂÃ¯Â¼ÂHTTP Ã¢ÂÂ + res.status + Ã¢ÂÂÃ¯Â¼ÂÃ¢ÂÂ);
 }
 var text = await res.text();
 var data = JSON.parse(text);
 
-if (data.status !== âokâ && data.status !== âresultâ) {
-throw new Error(âãªããºåå¾ã¨ã©ã¼: â + (data.error || data.status || âä¸æâ));
+if (data.status !== Ã¢ÂÂokÃ¢ÂÂ && data.status !== Ã¢ÂÂresultÃ¢ÂÂ) {
+throw new Error(Ã¢ÂÂÃ£ÂÂªÃ£ÂÂÃ£ÂÂºÃ¥ÂÂÃ¥Â¾ÂÃ£ÂÂ¨Ã£ÂÂ©Ã£ÂÂ¼: Ã¢ÂÂ + (data.error || data.status || Ã¢ÂÂÃ¤Â¸ÂÃ¦ÂÂÃ¢ÂÂ));
 }
-// data.data.odds[â1â] ãååãªããº {é¦¬çª: [ãªããº, ââ, äººæ°]}
-var oddsObj = data.data && data.data.odds && data.data.odds[â1â];
+// data.data.odds[Ã¢ÂÂ1Ã¢ÂÂ] Ã£ÂÂÃ¥ÂÂÃ¥ÂÂÃ£ÂÂªÃ£ÂÂÃ£ÂÂº {Ã©Â¦Â¬Ã§ÂÂª: [Ã£ÂÂªÃ£ÂÂÃ£ÂÂº, Ã¢ÂÂÃ¢ÂÂ, Ã¤ÂºÂºÃ¦Â°Â]}
+var oddsObj = data.data && data.data.odds && data.data.odds[Ã¢ÂÂ1Ã¢ÂÂ];
 if (!oddsObj || Object.keys(oddsObj).length === 0) {
-throw new Error(âãªããºãã¼ã¿ãç©ºã§ãï¼ã¾ã çºå£²åã®å¯è½æ§ãããã¾ãï¼â);
+throw new Error(Ã¢ÂÂÃ£ÂÂªÃ£ÂÂÃ£ÂÂºÃ£ÂÂÃ£ÂÂ¼Ã£ÂÂ¿Ã£ÂÂÃ§Â©ÂºÃ£ÂÂ§Ã£ÂÂÃ¯Â¼ÂÃ£ÂÂ¾Ã£ÂÂ Ã§ÂÂºÃ¥Â£Â²Ã¥ÂÂÃ£ÂÂ®Ã¥ÂÂ¯Ã¨ÂÂ½Ã¦ÂÂ§Ã£ÂÂÃ£ÂÂÃ£ÂÂÃ£ÂÂ¾Ã£ÂÂÃ¯Â¼ÂÃ¢ÂÂ);
 }
 var oddsArr = Object.entries(oddsObj).map(function(e) {
 return {num: parseInt(e[0]), odds: parseFloat(e[1][0]), popular: parseInt(e[1][2])};
