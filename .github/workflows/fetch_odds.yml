@@ -69,7 +69,7 @@ jobs:
           PYEOF
 
       - name: Auto detect and fetch pre-race odds
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.race_id == '')
+        if: github.event_name == 'schedule'
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: |
@@ -84,10 +84,10 @@ jobs:
 
           print(f'JST: {now_jst.strftime("%H:%M")} ({now_min}min)')
 
-          # 10:00-16:30のみ実行
-          if now_min < 600 or now_min > 990:
-            print('Outside race hours, skipping')
-            exit(0)
+          # 10:00-16:30のみ実行（テスト中は無効）
+          # if now_min < 600 or now_min > 990:
+          #   print('Outside race hours, skipping')
+          #   exit(0)
 
           # 当日のrace_listから発走時刻とrace_idを取得
           with open('kaisai.json') as f:
@@ -128,8 +128,8 @@ jobs:
             print('No races found with time info')
             exit(0)
 
-          # 発走まで5〜10分のレースを検出
-          target_races = [r for r in races if 5 <= (r['start_min'] - now_min) <= 10]
+          # 発走まで5〜10分のレースを検出（テスト中は全レース表示）
+          target_races = races[:1]  # テスト用: 最初の1レースだけ
           print(f'Target races (5-10min): {target_races}')
 
           for race in target_races:
