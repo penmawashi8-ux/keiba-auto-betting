@@ -25,11 +25,10 @@ function calculatePortfolio(odds, budgetInput, countInput) {
 
   var budget = budgetInput ? parseInt(budgetInput) : 1000;
   var maxCount = countInput ? parseInt(countInput) : odds.length;
+  var candidates = odds.slice(0, maxCount);
 
   // 逆数比率配分で利益が出る最大頭数を探す
-  var candidates = odds.slice(0, maxCount);
   var picks = [];
-
   for (var n = candidates.length; n >= 1; n--) {
     var top = candidates.slice(0, n);
     var inv = top.map(function(o){ return 1/o.odds; });
@@ -43,13 +42,7 @@ function calculatePortfolio(odds, budgetInput, countInput) {
     }));
     if (minPayout > totalBet) {
       picks = top.map(function(o,i){
-        return {
-          horse_num: o.horse_num,
-          horse_name: o.horse_name,
-          odds: o.odds,
-          bet: bets[i],
-          payout: Math.round(bets[i]*o.odds)
-        };
+        return {horse_num:o.horse_num, horse_name:o.horse_name, odds:o.odds, bet:bets[i], payout:Math.round(bets[i]*o.odds)};
       });
       break;
     }
@@ -63,8 +56,28 @@ function calculatePortfolio(odds, budgetInput, countInput) {
   var payouts  = picks.map(function(p){ return p.payout; });
   var minPay   = Math.min.apply(null, payouts);
   var maxPay   = Math.max.apply(null, payouts);
+  var pickRatio = picks.length / odds.length;
 
-  return {found:true, spread:spread.toFixed(2), picks:picks, totalBet:totalBet, minPay:minPay, maxPay:maxPay, minProfit:minPay-totalBet};
+  // 通知条件チェック: 頭数40%以上 or 割れ目指数3.0以上
+  var condA = pickRatio >= 0.4;
+  var condB = spread >= 3.0;
+  var recommended = condA || condB;
+  var recommendReason = [];
+  if (condA) recommendReason.push('頭数' + picks.length + '/' + odds.length + '頭(' + Math.round(pickRatio*100) + '%)');
+  if (condB) recommendReason.push('割れ目指数' + spread.toFixed(2));
+
+  return {
+    found: true,
+    recommended: recommended,
+    recommendReason: recommendReason.join(' & '),
+    spread: spread.toFixed(2),
+    picks: picks,
+    totalBet: totalBet,
+    minPay: minPay,
+    maxPay: maxPay,
+    minProfit: minPay - totalBet,
+    pickRatio: pickRatio
+  };
 }
 
 function displayResults(odds, portfolio) {
@@ -73,12 +86,14 @@ function displayResults(odds, portfolio) {
   for (var i=0; i<odds.length; i++) {
     var o = odds[i];
     var isPick = portfolio.found && portfolio.picks.some(function(p){ return p.horse_num===o.horse_num; });
-    var style  = isPick ? 'background:#fff9c4;font-weight:bold;' : '';
+    var style = isPick ? 'background:#fff9c4;font-weight:bold;' : '';
     html += '<tr style="'+style+'"><td>'+(i+1)+'\u4eba\u6c17</td><td>'+o.horse_num+'</td><td>'+o.horse_name+'</td><td>'+o.odds.toFixed(1)+'\u500d</td></tr>';
   }
   html += '</tbody></table>';
-  if (portfolio.found) {
-    html += '<div class="alert-success">\u2705 <strong>\u5272\u308c\u76ee\u691c\u51fa\uff01\u8cfc\u5165\u63a8\u5968</strong><br>\u5272\u308c\u76ee\u6307\u6570: <strong>'+portfolio.spread+'\u500d</strong></div>';
+  if (portfolio.found && portfolio.recommended) {
+    html += '<div class="alert-success">\u2705 <strong>\u8cfc\u5165\u63a8\u5968\uff01</strong> '+portfolio.recommendReason+'<br>\u5272\u308c\u76ee\u6307\u6570: <strong>'+portfolio.spread+'\u500d</strong></div>';
+  } else if (portfolio.found && !portfolio.recommended) {
+    html += '<div class="alert-danger">\u26A0\uFE0F <strong>\u6761\u4ef6\u4e0d\u6e80\u8db3</strong> \u2014 \u982'+Math.round(portfolio.pickRatio*100)+'%\u30fb\u6307\u6570'+portfolio.spread+'(\u30564\u0030%\u4ee5\u4e0a\u304b\u6307\u65703.0\u4ee5\u4e0a\u304c\u5fc5\u8981)</div>';
   } else {
     html += '<div class="alert-danger">\u274C <strong>\u8cfc\u5165\u898b\u9001\u308a</strong> \u2014 '+portfolio.reason+'</div>';
   }
