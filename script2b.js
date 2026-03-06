@@ -1,33 +1,33 @@
 function generateMockOdds() {
   return [
-    {horse_num:3, odds:2.1, horse_name:'アローエクスプレス'},
-    {horse_num:7, odds:3.5, horse_name:'ゴールドシップ'},
-    {horse_num:1, odds:4.2, horse_name:'ディープインパクト'},
-    {horse_num:11,odds:8.5, horse_name:'キングカメハメハ'},
-    {horse_num:5, odds:12.0,horse_name:'オルフェーヴル'},
-    {horse_num:9, odds:18.5,horse_name:'ジェンテイルドンナ'},
-    {horse_num:2, odds:25.0,horse_name:'ブエナビスタ'},
-    {horse_num:14,odds:35.0,horse_name:'ウオッカ'},
+    {horse_num:3, odds:2.1, horse_name:'ã¢ã­ã¼ã¨ã¯ã¹ãã¬ã¹'},
+    {horse_num:7, odds:3.5, horse_name:'ã´ã¼ã«ãã·ãã'},
+    {horse_num:1, odds:4.2, horse_name:'ãã£ã¼ãã¤ã³ãã¯ã'},
+    {horse_num:11,odds:8.5, horse_name:'ã­ã³ã°ã«ã¡ãã¡ã'},
+    {horse_num:5, odds:12.0,horse_name:'ãªã«ãã§ã¼ã´ã«'},
+    {horse_num:9, odds:18.5,horse_name:'ã¸ã§ã³ãã¤ã«ãã³ã'},
+    {horse_num:2, odds:25.0,horse_name:'ãã¨ããã¹ã¿'},
+    {horse_num:14,odds:35.0,horse_name:'ã¦ãªãã«'},
   ].sort(function(a,b){ return a.odds - b.odds; });
 }
 
 function calculatePortfolio(odds, budgetInput, countInput) {
-  if (!odds || odds.length < 4) return {found:false, reason:'出走馬が少なすぎます'};
+  if (!odds || odds.length < 4) return {found:false, reason:'åºèµ°é¦¬ãå°ãªããã¾ã'};
 
   var top3 = odds.slice(0,3);
   var rest  = odds.slice(3);
   function avg(arr){ var s=0; arr.forEach(function(o){s+=o.odds;}); return s/arr.length; }
   var spread = avg(rest) / avg(top3);
-  console.log('割れ目指数:', spread.toFixed(2));
+  console.log('å²ãç®ææ°:', spread.toFixed(2));
   if (spread < 2.0) {
-    return {found:false, spread:spread.toFixed(2), reason:'割れ目指数 '+spread.toFixed(2)+' < 2.0 のため購入見送り'};
+    return {found:false, spread:spread.toFixed(2), reason:'å²ãç®ææ° '+spread.toFixed(2)+' < 2.0 ã®ããè³¼å¥è¦éã'};
   }
 
   var budget = budgetInput ? parseInt(budgetInput) : 1000;
   var maxCount = countInput ? parseInt(countInput) : odds.length;
   var candidates = odds.slice(0, maxCount);
 
-  // 逆数比率配分で利益が出る最大頭数を探す
+  // éæ°æ¯çéåã§å©çãåºãæå¤§é ­æ°ãæ¢ã
   var picks = [];
   for (var n = candidates.length; n >= 1; n--) {
     var top = candidates.slice(0, n);
@@ -49,7 +49,7 @@ function calculatePortfolio(odds, budgetInput, countInput) {
   }
 
   if (!picks || picks.length === 0) {
-    return {found:false, spread:spread.toFixed(2), reason:'予算内で利益が出る組み合わせが見つかりません'};
+    return {found:false, spread:spread.toFixed(2), reason:'äºç®åã§å©çãåºãçµã¿åãããè¦ã¤ããã¾ãã'};
   }
 
   var totalBet = picks.reduce(function(s,p){ return s+p.bet; }, 0);
@@ -58,13 +58,13 @@ function calculatePortfolio(odds, budgetInput, countInput) {
   var maxPay   = Math.max.apply(null, payouts);
   var pickRatio = picks.length / odds.length;
 
-  // 通知条件チェック: 頭数40%以上 or 割れ目指数3.0以上
+  // éç¥æ¡ä»¶ãã§ãã¯: é ­æ°40%ä»¥ä¸ or å²ãç®ææ°3.0ä»¥ä¸
   var condA = pickRatio >= 0.4;
   var condB = spread >= 3.0;
   var recommended = condA || condB;
   var recommendReason = [];
-  if (condA) recommendReason.push('頭数' + picks.length + '/' + odds.length + '頭(' + Math.round(pickRatio*100) + '%)');
-  if (condB) recommendReason.push('割れ目指数' + spread.toFixed(2));
+  if (condA) recommendReason.push('é ­æ°' + picks.length + '/' + odds.length + 'é ­(' + Math.round(pickRatio*100) + '%)');
+  if (condB) recommendReason.push('å²ãç®ææ°' + spread.toFixed(2));
 
   return {
     found: true,
@@ -122,3 +122,5 @@ function handleGoToUmaca() {
 function showError(msg) { var el=document.getElementById('error'); el.innerHTML=msg.replace(/\n/g,'<br>'); el.style.display='block'; }
 function hideError() { document.getElementById('error').style.display='none'; }
 function showLoading(show) { document.getElementById('loading').style.display=show?'block':'none'; }
+
+window.calculatePortfolio=calculatePortfolio;window.generateMockOdds=generateMockOdds;window.displayResults=displayResults;window.displayPortfolioInfo=displayPortfolioInfo;window.handleGoToUmaca=handleGoToUmaca;
