@@ -1,3 +1,6 @@
+function showError(m){var e=document.getElementById("error");if(e){e.innerHTML=m;e.style.display="block";}}
+function hideError(){var e=document.getElementById("error");if(e)e.style.display="none";}
+function showLoading(s){var e=document.getElementById("loading");if(e)e.style.display=s?"block":"none";}
 
 function getRaceId() {
   if (currentMode === 'direct') {
