@@ -23,72 +23,40 @@ function calculatePortfolio(odds, budgetInput, countInput) {
     return {found:false, spread:spread.toFixed(2), reason:'割れ目指数 '+spread.toFixed(2)+' < 2.0 のため購入見送り'};
   }
 
-  var budget = budgetInput ? parseInt(budgetInput) : null;
-  var maxCount = countInput ? parseInt(countInput) : null;
+  var budget = budgetInput ? parseInt(budgetInput) : 1000;
+  var maxCount = countInput ? parseInt(countInput) : odds.length;
 
-  // 期待値がプラスの馬を抽出（還元率80%として期待値 = odds * 0.8 > 1 → odds > 1.25）
-  // 実際には人気順上位から選ぶ（1番人気から順に期待値が高い想定）
-  var candidates = odds.slice(); // 人気順
-
+  // 逆数比率配分で利益が出る最大頭数を探す
+  var candidates = odds.slice(0, maxCount);
   var picks = [];
 
-  if (budget && !maxCount) {
-    // 予算のみ: 予算内で利益がプラスになるよう頭数を最大化
-    // 均等配分で試す: N頭に均等配分して最低払戻 > 予算 となる最大Nを探す
-    var bestPicks = [];
-    for (var n = candidates.length; n >= 1; n--) {
-      var trial = candidates.slice(0, n);
-      var betEach = Math.floor(budget / n / 100) * 100;
-      if (betEach < 100) continue;
-      var totalBet = betEach * n;
-      var minPayout = Math.min.apply(null, trial.map(function(o){ return betEach * o.odds; }));
-      if (minPayout > totalBet) {
-        bestPicks = trial.map(function(o){
-          return {horse_num:o.horse_num, horse_name:o.horse_name, odds:o.odds, bet:betEach, payout:Math.round(betEach*o.odds)};
-        });
-        break;
-      }
+  for (var n = candidates.length; n >= 1; n--) {
+    var top = candidates.slice(0, n);
+    var inv = top.map(function(o){ return 1/o.odds; });
+    var sumInv = inv.reduce(function(s,v){ return s+v; }, 0);
+    var bets = top.map(function(o,i){
+      return Math.max(100, Math.round(inv[i]/sumInv*budget/100)*100);
+    });
+    var totalBet = bets.reduce(function(s,v){ return s+v; }, 0);
+    var minPayout = Math.min.apply(null, top.map(function(o,i){
+      return Math.round(bets[i]*o.odds);
+    }));
+    if (minPayout > totalBet) {
+      picks = top.map(function(o,i){
+        return {
+          horse_num: o.horse_num,
+          horse_name: o.horse_name,
+          odds: o.odds,
+          bet: bets[i],
+          payout: Math.round(bets[i]*o.odds)
+        };
+      });
+      break;
     }
-    picks = bestPicks;
-
-  } else if (!budget && maxCount) {
-    // 頭数のみ: 上位N頭を逆数比率で配分（デフォルト予算1000円）
-    var BUDGET = 1000;
-    var top = candidates.slice(0, maxCount);
-    var inverses = top.map(function(o){ return 1/o.odds; });
-    var sumInv = inverses.reduce(function(s,v){ return s+v; }, 0);
-    picks = top.map(function(o,i){
-      var raw = (inverses[i]/sumInv)*BUDGET;
-      var bet = Math.max(100, Math.round(raw/100)*100);
-      return {horse_num:o.horse_num, horse_name:o.horse_name, odds:o.odds, bet:bet, payout:Math.round(bet*o.odds)};
-    });
-
-  } else if (budget && maxCount) {
-    // 両方: 予算内かつ頭数以内で逆数比率配分
-    var top = candidates.slice(0, maxCount);
-    var inverses = top.map(function(o){ return 1/o.odds; });
-    var sumInv = inverses.reduce(function(s,v){ return s+v; }, 0);
-    picks = top.map(function(o,i){
-      var raw = (inverses[i]/sumInv)*budget;
-      var bet = Math.max(100, Math.round(raw/100)*100);
-      return {horse_num:o.horse_num, horse_name:o.horse_name, odds:o.odds, bet:bet, payout:Math.round(bet*o.odds)};
-    });
-
-  } else {
-    // 何も入力なし: デフォルト（上位3頭・1000円）
-    var BUDGET = 1000;
-    var top = candidates.slice(0, 3);
-    var inverses = top.map(function(o){ return 1/o.odds; });
-    var sumInv = inverses.reduce(function(s,v){ return s+v; }, 0);
-    picks = top.map(function(o,i){
-      var raw = (inverses[i]/sumInv)*BUDGET;
-      var bet = Math.max(100, Math.round(raw/100)*100);
-      return {horse_num:o.horse_num, horse_name:o.horse_name, odds:o.odds, bet:bet, payout:Math.round(bet*o.odds)};
-    });
   }
 
   if (!picks || picks.length === 0) {
-    return {found:false, spread:spread.toFixed(2), reason:'予算内で利益がプラスになる組み合わせが見つかりません'};
+    return {found:false, spread:spread.toFixed(2), reason:'予算内で利益が出る組み合わせが見つかりません'};
   }
 
   var totalBet = picks.reduce(function(s,p){ return s+p.bet; }, 0);
