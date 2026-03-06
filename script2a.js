@@ -131,3 +131,64 @@ window.loadOddsJson = loadOddsJson;
 window.showError = showError;
 window.hideError = hideError;
 window.showLoading = showLoading;
+
+var approvedRaceId=null;
+var approvalTimer=null;
+
+function getGhToken(){
+  var t=localStorage.getItem('gh_token');
+  if(!t){t=prompt('GitHub Personal Access Tokenãå¥åãã¦ãã ãã:');if(t)localStorage.setItem('gh_token',t);}
+  return t;
+}
+
+function showApprovalCard(raceId,startTimeStr){
+  approvedRaceId=raceId;
+  document.getElementById('approvalCard').style.display='block';
+  document.getElementById('approvalRaceInfo').textContent='race_id:'+raceId+' start:'+startTimeStr;
+  window._approvalStartTime=startTimeStr;
+}
+
+function handleApproval(){
+  if(!approvedRaceId){alert('no race_id');return;}
+  var t=window._approvalStartTime;
+  if(!t){alert('no start time');return;}
+  var now=new Date();
+  var h=parseInt(t.split(':')[0]),m=parseInt(t.split(':')[1]);
+  var trigger=new Date(now.getFullYear(),now.getMonth(),now.getDate(),h,m-2,0);
+  var left=trigger-now;
+  window._approvalBudget=document.getElementById('approvalBudget').value;
+  window._approvalCount=document.getElementById('approvalCount').value;
+  document.getElementById('approvalBtn').disabled=true;
+  document.getElementById('timerDisplay').style.display='block';
+  var status=document.getElementById('approvalStatus');
+  if(left<=0){status.textContent='Fetching now...';triggerActionsAndReload(approvedRaceId);return;}
+  status.textContent='Auto fetch 2min before start';
+  approvalTimer=setInterval(function(){
+    var l=trigger-new Date();
+    if(l<=0){clearInterval(approvalTimer);document.getElementById('timerDisplay').textContent='Fetching...';triggerActionsAndReload(approvedRaceId);return;}
+    var mm=Math.floor(l/60000),ss=Math.floor((l%60000)/1000);
+    document.getElementById('timerDisplay').textContent=mm+'m'+ss+'s';
+  },1000);
+}
+
+async function triggerActionsAndReload(raceId){
+  var status=document.getElementById('approvalStatus');
+  status.textContent='Starting Actions...';
+  var token=getGhToken();
+  if(!token){status.textContent='Token missing';return;}
+  try{
+    var r=await fetch('https://api.github.com/repos/penmawashi8-ux/keiba-auto-betting/actions/workflows/fetch_odds.yml/dispatches',{method:'POST',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},body:JSON.stringify({ref:'main',inputs:{race_id:raceId}})});
+    if(r.status===204){
+      status.textContent='Actions started. Reloading in 30s...';
+      setTimeout(async function(){
+        await handleFetchOdds();
+        status.textContent='Done!';
+      },30000);
+    } else {
+      status.textContent='Actions error: '+r.status;
+    }
+  }catch(e){status.textContent='Error:'+e.message;}
+}
+
+window.showApprovalCard=showApprovalCard;
+window.handleApproval=handleApproval;
