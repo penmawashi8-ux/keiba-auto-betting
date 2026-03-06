@@ -64,7 +64,9 @@ async function handleFetchOdds() {
 
   try {
     try {
-      odds = await loadOddsJson(raceId);
+      var oddsJson = await loadOddsJson(raceId);
+      if(oddsJson.race_id && raceId && oddsJson.race_id !== raceId){showError("race_id mismatch\n select:"+raceId+"\n fetched:"+oddsJson.race_id);return;}
+      odds = oddsJson;
       dataSource = 'OK: odds.json';
     } catch(e) {
       console.warn('odds.json failed:', e.message);
