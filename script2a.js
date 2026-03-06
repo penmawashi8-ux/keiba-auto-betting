@@ -123,3 +123,6 @@ window.updatePreview = updatePreview;
 window.triggerActions = triggerActions;
 window.handleFetchOdds = handleFetchOdds;
 window.loadOddsJson = loadOddsJson;
+window.showError = showError;
+window.hideError = hideError;
+window.showLoading = showLoading;
