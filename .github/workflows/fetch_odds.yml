@@ -89,7 +89,6 @@ jobs:
             print('Outside race hours, skipping')
             exit(0)
 
-          # 当日のrace_listから発走時刻とrace_idを取得
           with open('kaisai.json') as f:
             kaisai = json.load(f)
 
@@ -97,32 +96,29 @@ jobs:
             print(f'No kaisai for {today}')
             exit(0)
 
-          # 各競馬場の全レース発走時刻を取得
+          # 当日の全レース発走時刻をRaceList_NameBoxブロックから取得
           races = []
           for vc, info in kaisai[today].items():
             sample_id = info.get('sample_race_id', '')
             if not sample_id:
               continue
-            base_id = sample_id[:10]
-            url = f'https://race.sp.netkeiba.com/?pid=race_list&kaisai_date={today}'
+            url = f'https://race.netkeiba.com/race/list.html?kaisai_date={today}'
             try:
-              req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)'})
+              req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0', 'Referer': 'https://race.netkeiba.com/'})
               with urllib.request.urlopen(req, timeout=10) as r:
                 html = r.read().decode('utf-8', errors='ignore')
 
-              # race_idと発走時刻のペアを抽出
-              # パターン: race_id=XXXXXXXXXXXX の近くに HH:MM がある
-              pattern = r'race_id=(\d{12})[^<]*?(\d{2}:\d{2})'
-              # より広いパターンで探す
-              blocks = re.findall(r'race_id=(\d{12}).*?(\d{2}:\d{2})', html[:50000])
-              for rid, time_str in blocks:
-                if rid[:10] == base_id or rid[4:6] == vc:
-                  h, m = map(int, time_str.split(':'))
+              blocks = re.split(r'(?=<div class="RaceList_NameBox")', html)
+              for block in blocks:
+                rid = re.search(r'MyRace-Item-(\d{12})', block)
+                time_match = re.search(r'(\d{2}:\d{2})発走', block)
+                if rid and time_match:
+                  h, m = map(int, time_match.group(1).split(':'))
                   start_min = h * 60 + m
-                  races.append({'race_id': rid, 'start_min': start_min, 'time_str': time_str})
-                  print(f'Race: {rid} at {time_str}')
+                  races.append({'race_id': rid.group(1), 'start_min': start_min, 'time_str': time_match.group(1)})
+                  print(f'Race: {rid.group(1)} at {time_match.group(1)}')
             except Exception as e:
-              print(f'Error fetching race list for vc={vc}: {e}')
+              print(f'Error fetching race list: {e}')
 
           if not races:
             print('No races found with time info')
@@ -130,20 +126,19 @@ jobs:
 
           # 発走まで5〜10分のレースを検出
           target_races = [r for r in races if 5 <= (r['start_min'] - now_min) <= 10]
-          print(f'Target races (5-10min): {target_races}')
+          print(f'Target races (5-10min before): {target_races}')
 
           for race in target_races:
             race_id = race['race_id']
             print(f'Fetching odds for {race_id} (starts {race["time_str"]})')
 
-            # オッズ取得
             try:
               url = f'https://race.netkeiba.com/api/api_get_jra_odds.html?race_id={race_id}&type=1&action=update'
               req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0', 'Referer': 'https://race.netkeiba.com/'})
               with urllib.request.urlopen(req, timeout=10) as r:
                 data = json.loads(r.read())
 
-              if data.get('status') not in ['ok', 'result']:
+              if data.get('status') not in ['yoso', 'result', 'ok']:
                 print(f'Odds not ready: {data.get("status")}')
                 continue
 
@@ -166,50 +161,60 @@ jobs:
               spread = avg(rest) / avg(top3)
               print(f'Spread: {spread:.2f}')
 
-              # 割れ目検出
-              if spread >= 2.0:
-                top3_str = ' '.join([f'{o["horse_num"]}番({o["odds"]}倍)' for o in top3])
-                msg = f'割れ目検出! race_id:{race_id} 発走:{race["time_str"]} 指数:{spread:.2f} 推奨:{top3_str}'
+              # 利益が出る最大頭数を計算
+              best_n = 0
+              for n in range(len(odds_arr), 0, -1):
+                top = odds_arr[:n]
+                inv = [1/o['odds'] for o in top]
+                sum_inv = sum(inv)
+                bets = [max(100, round(inv[i]/sum_inv*1000/100)*100) for i in range(n)]
+                total = sum(bets)
+                min_pay = min(round(bets[i]*top[i]['odds']) for i in range(n))
+                if min_pay > total:
+                  best_n = n
+                  break
+
+              pick_ratio = best_n / len(odds_arr)
+              cond_a = pick_ratio >= 0.4
+              cond_b = spread >= 3.0
+
+              if spread >= 2.0 and (cond_a or cond_b):
+                top3_str = ' '.join([f'{o["horse_num"]}ban({o["odds"]}x)' for o in top3])
+                reasons = []
+                if cond_a: reasons.append(f'{best_n}/{len(odds_arr)}heads({round(pick_ratio*100)}%)')
+                if cond_b: reasons.append(f'spread{spread:.2f}')
+                msg = f'Wareme! {race_id} start:{race["time_str"]} {",".join(reasons)} top3:{top3_str}'
                 print(f'Notifying: {msg}')
 
-                # odds.jsonを保存
                 data['race_id'] = race_id
                 with open('odds.json', 'w') as f:
                   json.dump(data, f, ensure_ascii=False)
 
-                # ntfy通知
                 ntfy_url = f'https://ntfy.sh/{ntfy_topic}'
                 notify_req = urllib.request.Request(
                   ntfy_url,
                   data=msg.encode('utf-8'),
-                  headers={
-                    'Title': '競馬 割れ目検出',
-                    'Priority': 'high',
-                    'Tags': 'horse,money_with_wings'
-                  },
+                  headers={'Title': 'Keiba Wareme', 'Priority': 'high', 'Tags': 'horse,money_with_wings'},
                   method='POST'
                 )
                 with urllib.request.urlopen(notify_req, timeout=10) as r:
                   print(f'ntfy sent: {r.status}')
               else:
-                print(f'No spread for {race_id}: {spread:.2f}')
+                print(f'No signal: spread={spread:.2f} ratio={pick_ratio:.2f}')
 
             except Exception as e:
               print(f'Error for {race_id}: {e}')
-
           PYEOF
 
       - name: Manual fetch odds
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.race_id != ''
         env:
           RACE_ID: ${{ github.event.inputs.race_id }}
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: |
           python3 << 'PYEOF'
           import urllib.request, json, os
 
           race_id = os.environ.get('RACE_ID', '')
-          ntfy_topic = os.environ.get('NTFY_TOPIC', 'keiba-alert-penmawashi')
           if not race_id or len(race_id) != 12:
             print('Invalid race_id:', race_id)
             exit(0)
