@@ -93,7 +93,7 @@ function displayResults(odds, portfolio) {
   if (portfolio.found && portfolio.recommended) {
     html += '<div class="alert-success">\u2705 <strong>\u8cfc\u5165\u63a8\u5968\uff01</strong> '+portfolio.recommendReason+'<br>\u5272\u308c\u76ee\u6307\u6570: <strong>'+portfolio.spread+'\u500d</strong></div>';
   } else if (portfolio.found && !portfolio.recommended) {
-    html += '<div class="alert-danger">\u26A0\uFE0F <strong>\u6761\u4ef6\u4e0d\u6e80\u8db3</strong> \u2014 \u982'+Math.round(portfolio.pickRatio*100)+'%\u30fb\u6307\u6570'+portfolio.spread+'(\u30564\u0030%\u4ee5\u4e0a\u304b\u6307\u65703.0\u4ee5\u4e0a\u304c\u5fc5\u8981)</div>';
+    html += '<div class="alert-danger">\u26A0\uFE0F <strong>\u6761\u4ef6\u4e0d\u6e80\u8db3</strong> \u2014 \u982d\u6570'+Math.round(portfolio.pickRatio*100)+'%\u30fb\u6307\u6570'+portfolio.spread+'(40%\u4ee5\u4e0a\u304b3.0\u4ee5\u4e0a\u304c\u5fc5\u8981)</div>';
   } else {
     html += '<div class="alert-danger">\u274C <strong>\u8cfc\u5165\u898b\u9001\u308a</strong> \u2014 '+portfolio.reason+'</div>';
   }
