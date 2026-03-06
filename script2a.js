@@ -137,7 +137,7 @@ var approvalTimer=null;
 
 function getGhToken(){
   var t=localStorage.getItem('gh_token');
-  if(!t){t=prompt('GitHub Personal Access Tokenãå¥åãã¦ãã ãã:');if(t)localStorage.setItem('gh_token',t);}
+  if(!t){t=prompt('GitHub Personal Access TokenÃ£ÂÂÃ¥ÂÂ¥Ã¥ÂÂÃ£ÂÂÃ£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£ÂÂÃ£ÂÂ:');if(t)localStorage.setItem('gh_token',t);}
   return t;
 }
 
@@ -192,3 +192,5 @@ async function triggerActionsAndReload(raceId){
 
 window.showApprovalCard=showApprovalCard;
 window.handleApproval=handleApproval;
+
+document.addEventListener("DOMContentLoaded",function(){var p=new URLSearchParams(window.location.search);var rid=p.get("race_id"),st=p.get("start");if(rid&&st&&window.showApprovalCard){window.showApprovalCard(rid,st);}});
