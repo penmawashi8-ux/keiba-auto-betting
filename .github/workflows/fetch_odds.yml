@@ -84,7 +84,7 @@ jobs:
 
           print(f'JST: {now_jst.strftime("%H:%M")} ({now_min}min)')
 
-          # 10:00-16:30のみ実行
+          # 10:00-16:30ã®ã¿å®è¡
           if now_min < 600 or now_min > 990:
             print('Outside race hours, skipping')
             exit(0)
@@ -96,7 +96,7 @@ jobs:
             print(f'No kaisai for {today}')
             exit(0)
 
-          # 当日の全レース発走時刻をRaceList_NameBoxブロックから取得
+          # å½æ¥ã®å¨ã¬ã¼ã¹çºèµ°æå»ãRaceList_NameBoxãã­ãã¯ããåå¾
           races = []
           for vc, info in kaisai[today].items():
             sample_id = info.get('sample_race_id', '')
@@ -111,7 +111,7 @@ jobs:
               blocks = re.split(r'(?=<div class="RaceList_NameBox")', html)
               for block in blocks:
                 rid = re.search(r'MyRace-Item-(\d{12})', block)
-                time_match = re.search(r'(\d{2}:\d{2})発走', block)
+                time_match = re.search(r'(\d{2}:\d{2})çºèµ°', block)
                 if rid and time_match:
                   h, m = map(int, time_match.group(1).split(':'))
                   start_min = h * 60 + m
@@ -124,7 +124,7 @@ jobs:
             print('No races found with time info')
             exit(0)
 
-          # 発走まで5〜10分のレースを検出
+          # çºèµ°ã¾ã§5ã10åã®ã¬ã¼ã¹ãæ¤åº
           target_races = [r for r in races if 5 <= (r['start_min'] - now_min) <= 10]
           print(f'Target races (5-10min before): {target_races}')
 
@@ -161,7 +161,7 @@ jobs:
               spread = avg(rest) / avg(top3)
               print(f'Spread: {spread:.2f}')
 
-              # 利益が出る最大頭数を計算
+              # å©çãåºãæå¤§é ­æ°ãè¨ç®
               best_n = 0
               for n in range(len(odds_arr), 0, -1):
                 top = odds_arr[:n]
@@ -194,7 +194,7 @@ jobs:
                 notify_req = urllib.request.Request(
                   ntfy_url,
                   data=msg.encode('utf-8'),
-                  headers={'Title': 'Keiba Wareme', 'Priority': 'high', 'Tags': 'horse,money_with_wings'},
+                  headers={'Title': 'Keiba Wareme','Click': f'https://penmawashi8-ux.github.io/keiba-auto-betting/?race_id={race_id}&start={race["time_str"]}', 'Priority': 'high', 'Tags': 'horse,money_with_wings'},
                   method='POST'
                 )
                 with urllib.request.urlopen(notify_req, timeout=10) as r:
