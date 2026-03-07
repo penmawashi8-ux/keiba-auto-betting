@@ -59,7 +59,7 @@ window.onDateOrVenueChange = async function() {
   document.getElementById('kaisaiInfo').textContent = '⏳ 検索中...';
   try {
     var yyyymmdd = date.replace(/-/g, '');
-    var res = await fetch('kaisai.json?t='+Date.now());
+    var res = await fetch('https://raw.githubusercontent.com/penmawashi8-ux/keiba-auto-betting/main/kaisai.json?t='+Date.now());
     var kaisai = await res.json();
     if (kaisai[yyyymmdd] && kaisai[yyyymmdd][venueCode]) {
       var info = kaisai[yyyymmdd][venueCode];
