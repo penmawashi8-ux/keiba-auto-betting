@@ -67,7 +67,7 @@ jobs:
             target_races = [race_id_input]
           else:
             # auto: 5-10min before start
-            if now_min < 600 or now_min > 990:
+            if False:  # TEST
               print('Outside hours')
               exit(0)
             if today not in result or not result[today]:
