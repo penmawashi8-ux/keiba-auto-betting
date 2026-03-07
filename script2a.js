@@ -52,6 +52,8 @@ async function handleFetchOdds() {
   // kaisai情報を更新してからrace_id取得
   var date = document.getElementById('raceDate').value;
   var venueCode = document.getElementById('raceVenue').value;
+  var raceNum = document.getElementById('raceNum').value;
+  var raceId = null;
   if(date && venueCode) {
     try {
       var yyyymmdd = date.replace(/-/g,'');
@@ -59,13 +61,11 @@ async function handleFetchOdds() {
       var kaisai = await res.json();
       if(kaisai[yyyymmdd] && kaisai[yyyymmdd][venueCode]) {
         var info = kaisai[yyyymmdd][venueCode];
-        window._kaisaiTimes = info.times;
-        window._kaisaiDay = info.day;
-        window._kaisaiSampleId = info.sample_race_id || null;
+        var sampleId = info.sample_race_id;
+        raceId = sampleId.slice(0,10) + raceNum;
       }
     } catch(e) {}
   }
-  var raceId = getRaceId();
   if (!raceId || raceId.length !== 12) { showError('race_id not ready'); return; }
 
   // netkeibaから直接オッズ取得
