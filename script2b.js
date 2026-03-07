@@ -1,6 +1,7 @@
 function calculatePortfolio(oddsArr,budget,count){
 budget=parseInt(budget)||3000;
-var sorted=oddsArr.slice().filter(function(o){return o.odds>=1.1;}).sort(function(a,b){return b.odds-a.odds;});
+var sorted=oddsArr.slice().filter(function(o){return o.odds>=1.1;})..sort(function(a,b){return a.odds-b.odds;});
+
 var best=null;
 var maxN=count?Math.min(parseInt(count),sorted.length):Math.min(10,sorted.length);
 for(var n=2;n<=maxN;n++){
