@@ -66,7 +66,8 @@ async function handleFetchOdds() {
       }
     } catch(e) {}
   }
-  if (!raceId || raceId.length !== 12) { showError('race_id not ready'); return; }
+  console.log('date='+date+' venue='+venueCode+' raceNum='+raceNum+' raceId='+raceId);
+  if (!raceId || raceId.length !== 12) { showError('race_id not ready: '+raceId); return; }
 
   // netkeibaから直接オッズ取得
   showLoading(true);
