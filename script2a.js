@@ -80,6 +80,7 @@ async function handleFetchOdds() {
 
     var portfolio = calculatePortfolio(odds,document.getElementById("budgetInput")&&document.getElementById("budgetInput").value,document.getElementById("countInput")&&document.getElementById("countInput").value);
     cachedPortfolio = portfolio;
+window.cachedPortfolio = portfolio;
 
     document.getElementById('dataSource').textContent = dataSource;
     displayResults(odds, portfolio);
