@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>&#31111;&#39340; &#21463;&#12428;&#30446;&#26908;&#20986;&#12450;&#12503;&#12522;</title>
+<title>競馬 割れ目検出アプリ</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, sans-serif; background: #f5f5f5; color: #333; }
@@ -17,75 +17,91 @@ body { font-family: -apple-system, sans-serif; background: #f5f5f5; color: #333;
 .row > div { flex: 1; }
 select, input[type=text], input[type=date], input[type=number] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: white; }
 .input-hint { font-size: 11px; color: #999; margin-top: 2px; }
-.btn-search { background: linear-gradient(135deg, #2e7d32, #43a047); color: white; margin-bottom: 8px; font-size: 14px; padding: 12px; }
+.btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+.btn-blue { background: linear-gradient(135deg, #1565c0, #1976d2); color: white; }
+.btn-green { background: linear-gradient(135deg, #2e7d32, #43a047); color: white; }
+.btn-orange { background: linear-gradient(135deg, #e65100, #f57c00); color: white; }
+.btn-teal { background: linear-gradient(135deg, #00695c, #00897b); color: white; }
 .kaisai-info { font-size: 13px; padding: 8px 10px; border-radius: 8px; background: #f5f5f5; margin-bottom: 8px; min-height: 36px; }
 .race-id-display { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 10px; font-size: 13px; color: #2e7d32; text-align: center; margin-bottom: 8px; font-family: monospace; }
-.btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
-.btn-primary { background: linear-gradient(135deg, #1565c0, #1976d2); color: white; }
-.btn-actions { background: linear-gradient(135deg, #e65100, #f57c00); color: white; margin-top: 8px; font-size: 14px; padding: 12px; }
-.btn-approve { background: linear-gradient(135deg, #2e7d32, #43a047); color: white; margin-top: 8px; }
 #error { background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: none; font-size: 13px; }
 #loading { text-align: center; padding: 20px; display: none; color: #666; }
 #dataSource { font-size: 12px; color: #666; margin-bottom: 8px; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 th { background: #1a237e; color: white; padding: 8px 6px; text-align: center; }
 td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #f0f0f0; }
-.alert-success { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 12px; margin-top: 12px; color: #2e7d32; font-size: 14px; }
-.alert-danger { background: #ffebee; border: 1px solid #ef9a9a; border-radius: 8px; padding: 12px; margin-top: 12px; color: #c62828; font-size: 14px; }
-.portfolio-box { background: #f8f9fa; border-radius: 8px; padding: 12px; }
-.bet-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 13px; flex-wrap: wrap; gap: 4px; }
-.bet-amount { font-weight: bold; color: #1565c0; }
-.odds-label { color: #666; font-size: 12px; }
-.summary-row { display: flex; justify-content: space-between; padding-top: 10px; font-size: 13px; flex-wrap: wrap; gap: 4px; }
-.profit { color: #2e7d32; font-weight: bold; }
-.loss { color: #c62828; font-weight: bold; }
 .toggle-row { display: flex; gap: 8px; margin-bottom: 12px; }
 .toggle-btn { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 8px; background: white; font-size: 13px; cursor: pointer; }
 .toggle-btn.active { background: #1a237e; color: white; border-color: #1a237e; }
-.timer-display { text-align: center; font-size: 24px; font-weight: bold; color: #1565c0; padding: 12px 0; display: none; }
-.approval-status { font-size: 13px; color: #666; margin-top: 8px; text-align: center; }
+.portfolio-box { background: #f8f9fa; border-radius: 8px; padding: 12px; }
+.bet-row { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+.bet-horse { font-weight: bold; font-size: 15px; margin-bottom: 2px; }
+.bet-amount { color: #1565c0; font-weight: bold; }
+.bet-return { color: #666; font-size: 13px; }
+.summary-box { background: #e8f5e9; border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 14px; }
+.summary-row { display: flex; justify-content: space-between; padding: 3px 0; }
+.profit { color: #2e7d32; font-weight: bold; }
+.approval-card { background: #fff8e1; border: 2px solid #ffc107; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+.timer { font-size: 28px; font-weight: bold; text-align: center; color: #e65100; padding: 8px; }
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>&#x1F434; &#x7af6;&#x99ac; &#x5272;&#x308c;&#x76ee;&#x691c;&#x51fa;&#x30A2;&#x30D7;&#x30EA;</h1>
+  <h1>競馬 割れ目検出アプリ</h1>
 </div>
 <div class="container">
   <div id="error"></div>
+  <div id="approvalCard" class="approval-card" style="display:none">
+    <h2 style="color:#e65100;margin-bottom:8px">割れ目レース検出</h2>
+    <div id="approvalRaceInfo" style="font-size:13px;margin-bottom:12px;color:#555"></div>
+    <div class="row">
+      <div>
+        <label>予算</label>
+        <input type="number" id="approvalBudget" placeholder="例: 1000" min="100" step="100">
+      </div>
+      <div>
+        <label>頭数</label>
+        <input type="number" id="approvalCount" placeholder="例: 3" min="1" max="18">
+      </div>
+    </div>
+    <button class="btn btn-orange" id="approvalBtn" onclick="handleApproval()">同意して自動取得開始</button>
+    <div id="timerDisplay" class="timer" style="display:none"></div>
+    <div id="approvalStatus" style="font-size:13px;color:#666;margin-top:8px;text-align:center"></div>
+  </div>
   <div class="card">
-    <h2>&#x1F4C5; &#x30EC;&#x30FC;&#x30B9;&#x9078;&#x629E;</h2>
+    <h2>レース選択</h2>
     <div class="toggle-row">
-      <button class="toggle-btn active" id="modeSimple" onclick="switchMode('simple')">&#x1F4C5; &#x65E5;&#x4ED8;&#x30FB;&#x7af6;&#x99ac;&#x5834;&#x304B;&#x3089;</button>
-      <button class="toggle-btn" id="modeDirect" onclick="switchMode('direct')">&#x1F522; race_id&#x76F4;&#x63A5;&#x5165;&#x529B;</button>
+      <button class="toggle-btn active" id="modeSimple" onclick="switchMode('simple')">日付・競馬場から</button>
+      <button class="toggle-btn" id="modeDirect" onclick="switchMode('direct')">race_id直接入力</button>
     </div>
     <div id="panelSimple">
       <div class="row">
         <div>
-          <label>&#x1F4C5; &#x65E5;&#x4ED8;</label>
+          <label>日付</label>
           <input type="date" id="raceDate">
         </div>
         <div>
-          <label>&#x1F3DF; &#x7af6;&#x99ac;&#x5834;</label>
+          <label>競馬場</label>
           <select id="raceVenue">
-            <option value="01">&#x672D;&#x5E4C;</option>
-            <option value="02">&#x51FD;&#x9928;</option>
-            <option value="03">&#x798F;&#x5CF6;</option>
-            <option value="04">&#x65B0;&#x6F5F;</option>
-            <option value="05">&#x6771;&#x4EAC;</option>
-            <option value="06" selected>&#x4E2D;&#x5C71;</option>
-            <option value="07">&#x4E2D;&#x4EAC;</option>
-            <option value="08">&#x4EAC;&#x90FD;</option>
-            <option value="09">&#x962A;&#x795E;</option>
-            <option value="10">&#x5C0F;&#x5009;</option>
+            <option value="01">札幌</option>
+            <option value="02">函館</option>
+            <option value="03">福島</option>
+            <option value="04">新潟</option>
+            <option value="05">東京</option>
+            <option value="06" selected>中山</option>
+            <option value="07">中京</option>
+            <option value="08">京都</option>
+            <option value="09">阪神</option>
+            <option value="10">小倉</option>
           </select>
         </div>
       </div>
-      <button class="btn btn-search" id="searchKaisai">&#x1F50D; &#x958B;&#x50AC;&#x60C5;&#x5831;&#x3092;&#x691C;&#x7D22;</button>
-      <div class="kaisai-info" id="kaisaiInfo">&#x1F446; &#x65E5;&#x4ED8;&#x30FB;&#x7af6;&#x99ac;&#x5834;&#x3092;&#x9078;&#x3093;&#x3067;&#x691C;&#x7D22;&#x30DC;&#x30BF;&#x30F3;&#x3092;&#x62BC;&#x3057;&#x3066;&#x304F;&#x3060;&#x3055;&#x3044;</div>
+      <button class="btn btn-green" onclick="searchKaisai()">開催情報を検索</button>
+      <div class="kaisai-info" id="kaisaiInfo"></div>
       <div class="row">
         <div>
-          <label>&#x1F3C1; &#x30EC;&#x30FC;&#x30B9;&#x756A;&#x53F7;</label>
-          <select id="raceNum">
+          <label>レース番号</label>
+          <select id="raceNum" onchange="updatePreview()">
             <option value="01">1R</option><option value="02">2R</option><option value="03">3R</option>
             <option value="04">4R</option><option value="05">5R</option><option value="06">6R</option>
             <option value="07">7R</option><option value="08">8R</option><option value="09">9R</option>
@@ -93,61 +109,40 @@ td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #f0f0f0; }
           </select>
         </div>
       </div>
-      <div class="race-id-display" id="raceIdPreview">race_id: &#x8A08;&#x7B97;&#x4E2D;...</div>
-      <button class="btn btn-actions" onclick="triggerActions()">&#x26A1; GitHub Actions&#x3067;&#x30AA;&#x30C3;&#x30BA;&#x53D6;&#x5F97;</button>
+      <div class="race-id-display" id="raceIdPreview">race_id: 計算中...</div>
+      <button class="btn btn-orange" onclick="triggerActions()">GitHub Actionsでオッズ取得</button>
     </div>
     <div id="panelDirect" style="display:none">
-      <label style="font-size:13px;color:#555;margin-bottom:4px;display:block">race_id&#xFF0812&#x6841;&#xFF09;</label>
-      <input type="text" id="raceIdDirect" placeholder="&#x4F8B;: 202506050811" maxlength="12" style="font-family:monospace;letter-spacing:2px;">
+      <label style="font-size:13px;color:#555;margin-bottom:4px;display:block">race_id（12桁）</label>
+      <input type="text" id="raceIdDirect" placeholder="例: 202506050811" maxlength="12" style="font-family:monospace;letter-spacing:2px;">
     </div>
   </div>
-
   <div class="card">
-    <h2>&#x1F4B0; &#x30DD;&#x30FC;&#x30C8;&#x30D5;&#x30A9;&#x30EA;&#x30AA;&#x8A2D;&#x5B9A;</h2>
+    <h2>ポートフォリオ設定</h2>
     <div class="row">
       <div>
-        <label>&#x1F4B4; &#x4E88;&#x7B97;&#xFF08;&#x7A7A;&#x767D;&#x3067;&#x30C7;&#x30D5;&#x30A9;&#xFF09;</label>
-        <input type="number" id="budgetInput" placeholder="&#x4F8B;: 3000" min="100" step="100">
-        <div class="input-hint">&#x5165;&#x529B;&#x6642;&#x3001;&#x4E88;&#x7B97;&#x5185;&#x3067;&#x5229;&#x76CA;&#x6700;&#x5927;&#x306E;&#x982D;&#x6570;&#x3092;&#x81EA;&#x52D5;&#x9078;&#x629E;</div>
+        <label>予算（空白でデフォルト）</label>
+        <input type="number" id="budgetInput" placeholder="例: 3000" min="100" step="100">
+        <div class="input-hint">予算内で利益最大の頭数を自動選択</div>
       </div>
       <div>
-        <label>&#x1F434; &#x982D;&#x6570;&#xFF08;&#x7A7A;&#x767D;&#x3067;&#x30C7;&#x30D5;&#x30A9;&#xFF09;</label>
-        <input type="number" id="countInput" placeholder="&#x4F8B;: 3" min="1" max="18">
-        <div class="input-hint">&#x6307;&#x5B9A;&#x982D;&#x6570;&#x5185;&#x3067;&#x6700;&#x9069;&#x914D;&#x5206;</div>
+        <label>頭数（空白でデフォルト）</label>
+        <input type="number" id="countInput" placeholder="例: 3" min="1" max="18">
+        <div class="input-hint">指定頭数内で最適配分</div>
       </div>
     </div>
-    <button class="btn btn-primary" id="fetchOdds">&#x1F4CA; &#x30AA;&#x30C3;&#x30BA;&#x5206;&#x6790;</button>
+    <button class="btn btn-blue" onclick="handleFetchOdds()">オッズ分析</button>
   </div>
-
-  <div id="approvalCard" class="card" style="display:none">
-    <h2>&#x23F0; &#x767A;&#x8D70;&#x524D;&#x518D;&#x53D6;&#x5F97;</h2>
-    <div id="approvalRaceInfo" style="font-size:13px;color:#555;margin-bottom:12px;"></div>
-    <div class="row">
-      <div>
-        <label>&#x1F4B4; &#x4E88;&#x7B97;</label>
-        <input type="number" id="approvalBudget" placeholder="&#x4F8B;: 3000" min="100" step="100">
-      </div>
-      <div>
-        <label>&#x1F434; &#x982D;&#x6570;</label>
-        <input type="number" id="approvalCount" placeholder="&#x4F8B;: 3" min="1" max="18">
-      </div>
-    </div>
-    <div id="timerDisplay" class="timer-display"></div>
-    <button class="btn btn-approve" id="approvalBtn" onclick="handleApproval()">&#x2705; &#x540C;&#x610F;&#x3057;&#x3066;2&#x5206;&#x524D;&#x306B;&#x518D;&#x53D6;&#x5F97;</button>
-    <div id="approvalStatus" class="approval-status"></div>
-  </div>
-
-  <div id="loading">&#x23F3; &#x30AA;&#x30C3;&#x30BA;&#x53D6;&#x5F97;&#x4E2D;...</div>
-
+  <div id="loading">オッズ取得中...</div>
   <div id="outputSection" style="display:none">
     <div class="card">
       <div id="dataSource"></div>
       <div id="oddsResult"></div>
     </div>
     <div id="portfolioData" class="card" style="display:none">
-      <h2>&#x1F4B0; &#x63A8;&#x5968;&#x30DD;&#x30FC;&#x30C8;&#x30D5;&#x30A9;&#x30EA;&#x30AA;</h2>
+      <h2>推奨ポートフォリオ</h2>
       <div id="portfolioInfo"></div>
-      <button class="btn btn-primary" id="goToUmaca" style="margin-top:12px">&#x1F3E7; &#x30A6;&#x30DE;&#x30AB;&#x30B9;&#x30DE;&#x30FC;&#x30C8;&#x3067;&#x8CFC;&#x5165;</button>
+      <button class="btn btn-teal" onclick="goToUmaca()" style="margin-top:12px">ウマカスマートで購入</button>
     </div>
   </div>
 </div>
