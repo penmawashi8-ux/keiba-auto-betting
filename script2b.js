@@ -1,130 +1,77 @@
-function generateMockOdds() {
-  return [
-    {horse_num:3, odds:2.1, horse_name:'アローエクスプレス'},
-    {horse_num:7, odds:3.5, horse_name:'ゴールドシップ'},
-    {horse_num:1, odds:4.2, horse_name:'ディープインパクト'},
-    {horse_num:11,odds:8.5, horse_name:'キングカメハメハ'},
-    {horse_num:5, odds:12.0,horse_name:'オルフェーヴル'},
-    {horse_num:9, odds:18.5,horse_name:'ジェンテイルドンナ'},
-    {horse_num:2, odds:25.0,horse_name:'ブエナビスタ'},
-    {horse_num:14,odds:35.0,horse_name:'ウオッカ'},
-  ].sort(function(a,b){ return a.odds - b.odds; });
+function calculatePortfolio(oddsArr,budget,count){
+budget=parseInt(budget)||3000;
+var sorted=oddsArr.slice().filter(function(o){return o.odds>=1.1;}).sort(function(a,b){return b.odds-a.odds;});
+var best=null;
+var maxN=count?Math.min(parseInt(count),sorted.length):Math.min(10,sorted.length);
+for(var n=2;n<=maxN;n++){
+var horses=sorted.slice(0,n);
+var invSum=horses.reduce(function(s,h){return s+1/h.odds;},0);
+var bets=horses.map(function(h){var raw=(1/h.odds)/invSum*budget;return Math.max(100,Math.round(raw/100)*100);});
+var total=bets.reduce(function(s,b){return s+b;},0);
+if(total>budget*1.1)break;
+var minReturn=null;
+for(var i=0;i<horses.length;i++){var ret=bets[i]/100*horses[i].odds*100;if(minReturn===null||ret<minReturn)minReturn=ret;}
+var minProfit=minReturn-total;
+if(minProfit>0){best={horses:horses,bets:bets,total:total,minReturn:minReturn,minProfit:minProfit,n:n};}
+}
+if(!best)return{found:false};
+var maxReturn=null;
+for(var i=0;i<best.horses.length;i++){var ret=best.bets[i]/100*best.horses[i].odds*100;if(maxReturn===null||ret>maxReturn)maxReturn=ret;}
+best.maxReturn=maxReturn;
+best.found=true;
+return best;
 }
 
-function calculatePortfolio(odds, budgetInput, countInput) {
-  if (!odds || odds.length < 4) return {found:false, reason:'出走馬が少なすぎます'};
-
-  var top3 = odds.slice(0,3);
-  var rest  = odds.slice(3);
-  function avg(arr){ var s=0; arr.forEach(function(o){s+=o.odds;}); return s/arr.length; }
-  var spread = avg(rest) / avg(top3);
-  console.log('割れ目指数:', spread.toFixed(2));
-  if (spread < 2.0) {
-    return {found:false, spread:spread.toFixed(2), reason:'割れ目指数 '+spread.toFixed(2)+' < 2.0 のため購入見送り'};
-  }
-
-  var budget = budgetInput ? parseInt(budgetInput) : 1000;
-  var maxCount = countInput ? parseInt(countInput) : odds.length;
-  var candidates = odds.slice(0, maxCount);
-
-  // 逆数比率配分で利益が出る最大頭数を探す
-  var picks = [];
-  for (var n = candidates.length; n >= 1; n--) {
-    var top = candidates.slice(0, n);
-    var inv = top.map(function(o){ return 1/o.odds; });
-    var sumInv = inv.reduce(function(s,v){ return s+v; }, 0);
-    var bets = top.map(function(o,i){
-      return Math.max(100, Math.round(inv[i]/sumInv*budget/100)*100);
-    });
-    var totalBet = bets.reduce(function(s,v){ return s+v; }, 0);
-    var minPayout = Math.min.apply(null, top.map(function(o,i){
-      return Math.round(bets[i]*o.odds);
-    }));
-    if (minPayout > totalBet) {
-      picks = top.map(function(o,i){
-        return {horse_num:o.horse_num, horse_name:o.horse_name, odds:o.odds, bet:bets[i], payout:Math.round(bets[i]*o.odds)};
-      });
-      break;
-    }
-  }
-
-  if (!picks || picks.length === 0) {
-    return {found:false, spread:spread.toFixed(2), reason:'予算内で利益が出る組み合わせが見つかりません'};
-  }
-
-  var totalBet = picks.reduce(function(s,p){ return s+p.bet; }, 0);
-  var payouts  = picks.map(function(p){ return p.payout; });
-  var minPay   = Math.min.apply(null, payouts);
-  var maxPay   = Math.max.apply(null, payouts);
-  var pickRatio = picks.length / odds.length;
-
-  // 通知条件チェック: 頭数40%以上 or 割れ目指数3.0以上
-  var condA = pickRatio >= 0.4;
-  var condB = spread >= 3.0;
-  var recommended = condA || condB;
-  var recommendReason = [];
-  if (condA) recommendReason.push('頭数' + picks.length + '/' + odds.length + '頭(' + Math.round(pickRatio*100) + '%)');
-  if (condB) recommendReason.push('割れ目指数' + spread.toFixed(2));
-
-  return {
-    found: true,
-    recommended: recommended,
-    recommendReason: recommendReason.join(' & '),
-    spread: spread.toFixed(2),
-    picks: picks,
-    totalBet: totalBet,
-    minPay: minPay,
-    maxPay: maxPay,
-    minProfit: minPay - totalBet,
-    pickRatio: pickRatio
-  };
+function displayPortfolioInfo(portfolio){
+var box=document.getElementById('portfolioInfo');
+if(!portfolio.found){box.innerHTML='<p style="color:#999">割れ目なし</p>';return;}
+var html='<div class="portfolio-box">';
+for(var i=0;i<portfolio.horses.length;i++){
+var h=portfolio.horses[i];
+var b=portfolio.bets[i];
+var ret=Math.round(b/100*h.odds*100);
+html+='<div class="bet-row">';
+html+='<div class="bet-horse">'+h.horse_num+'番'+(h.horse_name?' '+h.horse_name:'')+'</div>';
+html+='<div class="bet-amount">'+b+'円</div>';
+html+='<div class="bet-return">@ '+h.odds+'倍 → '+ret+'円</div>';
+html+='</div>';
+}
+var minR=Math.round(portfolio.minReturn);
+var maxR=Math.round(portfolio.maxReturn);
+html+='<div class="summary-box">';
+html+='<div class="summary-row"><span>合計投資:</span><span>'+portfolio.total+'円</span></div>';
+html+='<div class="summary-row"><span>払戻:</span><span>'+minR+'〜'+maxR+'円</span></div>';
+html+='<div class="summary-row"><span>最低利益:</span><span class="profit">+'+Math.round(portfolio.minProfit)+'円</span></div>';
+html+='</div></div>';
+box.innerHTML=html;
 }
 
-function displayResults(odds, portfolio) {
-  var html = '<h3 style="margin-bottom:8px;font-size:14px;">\uD83D\uDCCA \u5358\u52dd\u30aa\u30c3\u30ba\u4e00\u89a7\uff08\u4eba\u6c17\u9806\uff09</h3>';
-  html += '<table><thead><tr><th>\u4eba\u6c17</th><th>\u99ac\u756a</th><th>\u99ac\u540d</th><th>\u5358\u52dd</th></tr></thead><tbody>';
-  for (var i=0; i<odds.length; i++) {
-    var o = odds[i];
-    var isPick = portfolio.found && portfolio.picks.some(function(p){ return p.horse_num===o.horse_num; });
-    var style = isPick ? 'background:#fff9c4;font-weight:bold;' : '';
-    html += '<tr style="'+style+'"><td>'+(i+1)+'\u4eba\u6c17</td><td>'+o.horse_num+'</td><td>'+o.horse_name+'</td><td>'+o.odds.toFixed(1)+'\u500d</td></tr>';
-  }
-  html += '</tbody></table>';
-  if (portfolio.found && portfolio.recommended) {
-    html += '<div class="alert-success">\u2705 <strong>\u8cfc\u5165\u63a8\u5968\uff01</strong> '+portfolio.recommendReason+'<br>\u5272\u308c\u76ee\u6307\u6570: <strong>'+portfolio.spread+'\u500d</strong></div>';
-  } else if (portfolio.found && !portfolio.recommended) {
-    html += '<div class="alert-danger">\u26A0\uFE0F <strong>\u6761\u4ef6\u4e0d\u6e80\u8db3</strong> \u2014 \u982d\u6570'+Math.round(portfolio.pickRatio*100)+'%\u30fb\u6307\u6570'+portfolio.spread+'(40%\u4ee5\u4e0a\u304b3.0\u4ee5\u4e0a\u304c\u5fc5\u8981)</div>';
-  } else {
-    html += '<div class="alert-danger">\u274C <strong>\u8cfc\u5165\u898b\u9001\u308a</strong> \u2014 '+portfolio.reason+'</div>';
-  }
-  document.getElementById('oddsResult').innerHTML = html;
+function buildNbCode(raceId,horseNum,amount){
+var venue=raceId.slice(4,6);
+var rnum=parseInt(raceId.slice(10,12));
+var rHex=rnum.toString(16).toUpperCase();
+var bits=[0x8000,0x4000,0x2000,0x1000,0x0800,0x0400,0x0200,0x0100,0x0080,0x0040,0x0020,0x0010,0x0008,0x0004,0x0002];
+var bit=bits[horseNum-1]||0;
+var bitHex=bit.toString(16).toUpperCase().padStart(4,'0');
+var horseBits=bitHex+'00000000000';
+return '1'+'00'+venue+rHex+'7'+'01'+'8'+horseBits+'0001';
 }
 
-function displayPortfolioInfo(portfolio) {
-  var html = '<div class="portfolio-box">';
-  for (var i=0; i<portfolio.picks.length; i++) {
-    var p = portfolio.picks[i];
-    html += '<div class="bet-row">\uD83D\uDC0E <strong>'+p.horse_num+'\u756a '+p.horse_name+'</strong><span class="bet-amount">'+p.bet+'\u5186</span><span class="odds-label">@ '+p.odds.toFixed(1)+'\u500d \u2192 <strong>'+p.payout+'\u5186</strong></span></div>';
-  }
-  var profit = portfolio.minProfit;
-  html += '<div class="summary-row"><div>\u5408\u8a08\u6295\u8cc7: <strong>'+portfolio.totalBet+'\u5186</strong></div><div>\u6255\u6231: <strong>'+portfolio.minPay+'\u301c'+portfolio.maxPay+'\u5186</strong>\u3000\u6700\u4f4e\u5229\u76ca: <strong class="'+(profit>=0?'profit':'loss')+'">'+(profit>=0?'+':'')+profit+'\u5186</strong></div></div>';
-  html += '</div>';
-  document.getElementById('portfolioInfo').innerHTML = html;
+function goToUmaca(){
+var portfolio=window.cachedPortfolio;
+var raceId=typeof getRaceId==='function'?getRaceId():'';
+if(!portfolio||!portfolio.found){alert('ポートフォリオがありません');return;}
+if(!raceId||raceId.length!==12){alert('race_idが不正です');return;}
+var bets=portfolio.horses.map(function(h,i){return{horseNum:h.horse_num,amount:portfolio.bets[i]};});
+localStorage.setItem('umaca_bets',JSON.stringify({raceId:raceId,bets:bets,total:portfolio.total}));
+var msg='【購入内容】\n';
+for(var i=0;i<bets.length;i++){msg+=bets[i].horseNum+'番 単勝 '+bets[i].amount+'円\n';}
+msg+='合計: '+portfolio.total+'円\n\nウマカスマートを開きます。740画面でブックマークレット「自動入力」をタップしてください。';
+alert(msg);
+window.open('https://www.ipat.jra.go.jp/sp/umaca/','_blank');
 }
-
-function handleGoToUmaca() {
-  if (!cachedPortfolio || !cachedPortfolio.found) { showError('\u8cfc\u5165\u63a8\u5968\u306e\u30dd\u30fc\u30c8\u30d5\u30a9\u30ea\u30aa\u304c\u3042\u308a\u307e\u305b\u3093'); return; }
-  var lines = cachedPortfolio.picks.map(function(p){ return '  '+p.horse_num+'\u756a\uff08'+p.horse_name+'\uff09: '+p.bet+'\u5186'; }).join('\n');
-  alert('\u3010\u5358\u52dd \u6295\u7968\u5185\u5bb9\u3011\n\n'+lines+'\n\n\u5408\u8a08: '+cachedPortfolio.totalBet+'\u5186\n\n\u30a6\u30de\u30ab\u30b9\u30de\u30fc\u30c8\u3092\u958b\u304d\u307e\u3059\u3002');
-  window.open('https://www.ipat.jra.go.jp/sp/umaca/index.cgi', '_blank');
-}
-
-function showError(msg) { var el=document.getElementById('error'); el.innerHTML=msg.replace(/\n/g,'<br>'); el.style.display='block'; }
-function hideError() { document.getElementById('error').style.display='none'; }
-function showLoading(show) { document.getElementById('loading').style.display=show?'block':'none'; }
 
 window.calculatePortfolio=calculatePortfolio;
-window.generateMockOdds=generateMockOdds;
-window.displayResults=displayResults;
 window.displayPortfolioInfo=displayPortfolioInfo;
-window.handleGoToUmaca=handleGoToUmaca;
+window.goToUmaca=goToUmaca;
+window.cachedPortfolio=null;
