@@ -31,6 +31,8 @@ window.addEventListener('load', function() {
   document.getElementById('raceDate').addEventListener('change', window.onDateOrVenueChange);
 
   document.getElementById('kaisaiInfo').textContent = '👆 日付・競馬場を選んで検索ボタンを押してください';
+  // ページ読み込み時に自動検索
+  window.onDateOrVenueChange();
 });
 
 window.switchMode = function(mode) {
