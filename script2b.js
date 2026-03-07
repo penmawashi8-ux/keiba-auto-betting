@@ -85,3 +85,15 @@ mock.forEach(function(o,i){o.popular=i+1;});
 return mock;
 }
 window.generateMockOdds=generateMockOdds;
+
+function displayResults(odds,portfolio){
+var el=document.getElementById('oddsResult');
+if(!el)return;
+var html='<table><tr><th>馬番</th><th>オッズ</th><th>人気</th></tr>';
+odds.forEach(function(o){
+html+='<tr><td>'+o.horse_num+'</td><td>'+o.odds+'</td><td>'+o.popular+'</td></tr>';
+});
+html+='</table>';
+el.innerHTML=html;
+}
+window.displayResults=displayResults;
