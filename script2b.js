@@ -63,29 +63,36 @@ var portfolio=window.cachedPortfolio;
 var raceId=typeof getRaceId==='function'?getRaceId():'';
 if(!portfolio||!portfolio.found){alert('ポートフォリオがありません');return;}
 if(!raceId||raceId.length!==12){alert('race_idが不正です');return;}
+var token=localStorage.getItem('gh_token')||prompt('GitHub Token:');
+if(token)localStorage.setItem('gh_token',token);
 var venue=raceId.slice(4,6);
 var rHex=parseInt(raceId.slice(10,12)).toString(16).toUpperCase();
 var bits=[0x8000,0x4000,0x2000,0x1000,0x0800,0x0400,0x0200,0x0100,0x0080,0x0040,0x0020,0x0010,0x0008,0x0004,0x0002];
-var nbCodes=[];
+var nbList=[];
 for(var i=0;i<portfolio.horses.length;i++){
 var h=portfolio.horses[i];
 var b=portfolio.bets[i];
 var bit=bits[h.horse_num-1]||0;
 var bitHex=bit.toString(16).toUpperCase().padStart(4,'0');
 var amtHex=Math.round(b/100).toString(16).toUpperCase().padStart(4,'0');
-nbCodes.push('"1'+'00'+venue+rHex+'701'+'8'+bitHex+'00000000000'+amtHex+'"');
+nbList.push('1'+'00'+venue+rHex+'701'+'8'+bitHex+'00000000000'+amtHex);
 }
-var bl='javascript:(function(){';
-for(var i=0;i<nbCodes.length;i++){
-bl+='Nb['+i+']='+nbCodes[i]+';';
+var data={nb:nbList,total:portfolio.total,ts:Date.now()};
+var url='https://api.github.com/repos/penmawashi8-ux/keiba-auto-betting/contents/bets.json';
+fetch(url,{headers:{Authorization:'token '+token}}).then(function(r){return r.json();}).then(function(d){
+var sha=d.sha||undefined;
+var body={message:'update bets',content:btoa(JSON.stringify(data))};
+if(sha)body.sha=sha;
+return fetch(url,{method:'PUT',headers:{Authorization:'token '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+}).then(function(r){
+if(r.status===200||r.status===201){
+alert('購入データ保存完了！\nウマカスマート740画面でブックマークレット「自動入力」をタップしてください\n\n合計:'+portfolio.total+'円');
+}else{
+alert('保存失敗: '+r.status);
 }
-bl+='ToSend();})()';
-navigator.clipboard.writeText(bl).then(function(){
-alert('コピーしました！\nウマカスマート740画面のアドレスバーに貼り付けて実行してください');
-}).catch(function(){
-prompt('以下をコピーしてウマカスマート740のアドレスバーに貼り付けてください',bl);
-});
+}).catch(function(e){alert('エラー: '+e.message);});
 }
+
 
 
 window.calculatePortfolio=calculatePortfolio;
