@@ -49,6 +49,7 @@ function triggerActions() {
 }
 
 async function handleFetchOdds() {
+  await window.onDateOrVenueChange();
   var raceId = getRaceId();
   if (!raceId || raceId.length !== 12) {
     showError('race_id not ready');
