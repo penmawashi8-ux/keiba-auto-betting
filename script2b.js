@@ -67,15 +67,13 @@ var token=localStorage.getItem('gh_token')||prompt('GitHub Token:');
 if(token)localStorage.setItem('gh_token',token);
 var venue=raceId.slice(4,6);
 var rHex=parseInt(raceId.slice(10,12)).toString(16).toUpperCase();
-var bits=[0x8000,0x4000,0x2000,0x1000,0x0800,0x0400,0x0200,0x0100,0x0080,0x0040,0x0020,0x0010,0x0008,0x0004,0x0002];
 var nbList=[];
 for(var i=0;i<portfolio.horses.length;i++){
 var h=portfolio.horses[i];
 var b=portfolio.bets[i];
-var bit=bits[h.horse_num-1]||0;
-var bitHex=bit.toString(16).toUpperCase().padStart(4,'0');
-var amtHex=('0000'+Math.round(b/100).toString(16).toUpperCase()).slice(-4);
-nbList.push('1'+'00'+venue+rHex+'701'+'8'+bitHex+'00000000000'+amtHex);
+var horseHex=((28-h.horse_num*4)>>>0).toString(16).toUpperCase().padStart(2,'0');
+var amt=Math.round(b/100);
+nbList.push('1'+'00'+venue+rHex+'70'+horseHex+'00000000000000'+h.horse_num.toString().padStart(2,'0')+amt);
 }
 var data={nb:nbList,total:portfolio.total,ts:Date.now()};
 var url='https://api.github.com/repos/penmawashi8-ux/keiba-auto-betting/contents/bets.json';
