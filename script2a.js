@@ -68,50 +68,43 @@ async function handleFetchOdds() {
   var raceId = getRaceId();
   if (!raceId || raceId.length !== 12) { showError('race_id not ready'); return; }
 
-  // GitHub Actionsでオッズ取得
+  // netkeibaから直接オッズ取得
   showLoading(true);
   document.getElementById('outputSection').style.display = 'none';
-  document.getElementById('loading').textContent = 'オッズ取得中... (約30秒)';
+  var oddsData = null;
   try {
-    var ghToken = localStorage.getItem('gh_token') || prompt('GitHub Token:');
-    if(ghToken) localStorage.setItem('gh_token', ghToken);
-    var dispatchRes = await fetch('https://api.github.com/repos/penmawashi8-ux/keiba-auto-betting/actions/workflows/fetch_odds.yml/dispatches', {
-      method: 'POST',
-      headers: { Authorization: 'token ' + ghToken, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ref: 'main', inputs: { race_id: raceId } })
-    });
-    if(!dispatchRes.ok) throw new Error('Actions起動失敗: ' + dispatchRes.status);
-
-    // 完了を待つ（最大90秒）
-    var waited = 0;
-    var oddsData = null;
-    while(waited < 90) {
-      await new Promise(r => setTimeout(r, 5000));
-      waited += 5;
-      document.getElementById('loading').textContent = 'オッズ取得中... (' + waited + '秒)';
-      try {
-        // Actionsの完了確認
-        var runsRes = await fetch('https://api.github.com/repos/penmawashi8-ux/keiba-auto-betting/actions/runs?per_page=1', {
-          headers: { Authorization: 'token ' + ghToken }
-        });
-        var runs = await runsRes.json();
-        var latestRun = runs.workflow_runs[0];
-        if(latestRun && latestRun.status === 'completed' && latestRun.conclusion === 'success') {
-          var oddsRes = await fetch('https://raw.githubusercontent.com/penmawashi8-ux/keiba-auto-betting/main/odds.json?t='+Date.now());
-          var od = await oddsRes.json();
-          if(od.race_id === raceId) { oddsData = od; break; }
-          // race_idが違っても完了したら使う
-          if(waited >= 30) { oddsData = od; break; }
-        }
-      } catch(e) {}
-    }
-    if(!oddsData) throw new Error('タイムアウト: オッズ取得できませんでした');
-    document.getElementById('loading').textContent = 'オッズ取得中...';
+    var oddsUrl = 'https://race.netkeiba.com/api/api_get_jra_odds.html?race_id=' + raceId + '&type=1&action=update';
+    var oddsRes = await fetch(oddsUrl, { headers: { Referer: 'https://race.netkeiba.com/' } });
+    if(!oddsRes.ok) throw new Error('HTTP ' + oddsRes.status);
+    oddsData = await oddsRes.json();
+    oddsData.race_id = raceId;
   } catch(e) {
-    showError(e.message);
-    showLoading(false);
-    return;
+    // CORSエラーならActionsにフォールバック
+    try {
+      var ghToken = localStorage.getItem('gh_token');
+      if(!ghToken) throw new Error('Token not found');
+      await fetch('https://api.github.com/repos/penmawashi8-ux/keiba-auto-betting/actions/workflows/fetch_odds.yml/dispatches', {
+        method: 'POST',
+        headers: { Authorization: 'token ' + ghToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ref: 'main', inputs: { race_id: raceId } })
+      });
+      var waited = 0;
+      while(waited < 90) {
+        await new Promise(r => setTimeout(r, 5000));
+        waited += 5;
+        document.getElementById('loading').textContent = 'オッズ取得中... (' + waited + '秒)';
+        try {
+          var od = await (await fetch('https://raw.githubusercontent.com/penmawashi8-ux/keiba-auto-betting/main/odds.json?t='+Date.now())).json();
+          if(od.race_id === raceId || waited >= 30) { oddsData = od; break; }
+        } catch(e2) {}
+      }
+    } catch(e2) {
+      showError('オッズ取得失敗: ' + e.message);
+      showLoading(false);
+      return;
+    }
   }
+  if(!oddsData) { showError('オッズ取得失敗'); showLoading(false); return; }
   if (!raceId || raceId.length !== 12) {
     showError('race_id not ready');
     return;
