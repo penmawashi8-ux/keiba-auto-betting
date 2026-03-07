@@ -75,3 +75,13 @@ window.calculatePortfolio=calculatePortfolio;
 window.displayPortfolioInfo=displayPortfolioInfo;
 window.goToUmaca=goToUmaca;
 window.cachedPortfolio=null;
+function generateMockOdds(){
+var mock=[];
+for(var i=1;i<=12;i++){
+mock.push({horse_num:i,horse_name:'',odds:Math.round((1+Math.random()*19)*10)/10,popular:i});
+}
+mock.sort(function(a,b){return a.odds-b.odds;});
+mock.forEach(function(o,i){o.popular=i+1;});
+return mock;
+}
+window.generateMockOdds=generateMockOdds;
