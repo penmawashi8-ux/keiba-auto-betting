@@ -8,9 +8,19 @@ var VENUE_CODES = {
 
 document.addEventListener('DOMContentLoaded', function() {
   var today = new Date();
-  var yyyy = today.getFullYear();
-  var mm = String(today.getMonth()+1).padStart(2,'0');
-  var dd = String(today.getDate()).padStart(2,'0');
+  // 直近の開催日（土日）を探す
+  var d = new Date(today);
+  var dow = d.getDay(); // 0=日,6=土
+  if(dow === 0 || dow === 6) {
+    // 今日が土日ならそのまま
+  } else {
+    // 平日なら直近の土曜に戻す
+    var diff = dow === 0 ? 1 : dow - 6;
+    d.setDate(d.getDate() - (dow === 1 ? 2 : dow - 6));
+  }
+  var yyyy = d.getFullYear();
+  var mm = String(d.getMonth()+1).padStart(2,'0');
+  var dd = String(d.getDate()).padStart(2,'0');
   document.getElementById('raceDate').value = yyyy+'-'+mm+'-'+dd;
 
   document.getElementById('raceNum').addEventListener('change', window.updatePreview);
