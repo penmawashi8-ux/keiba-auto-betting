@@ -109,7 +109,8 @@ async function loadOddsJson(expectedRaceId) {
   var text = await res.text();
   var data = JSON.parse(text);
 
-  if (data.status !== 'ok' && data.status !== 'result') {
+  if (data.status !== 'ok' && data.status !== 'result' && data.status !== 'middle') {
+
     throw new Error('Odds error: ' + (data.error || data.status || 'unknown'));
   }
   // win odds
