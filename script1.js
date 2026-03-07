@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('fetchOdds').addEventListener('click', window.handleFetchOdds);
   document.getElementById('goToUmaca').addEventListener('click', window.handleGoToUmaca);
   document.getElementById('searchKaisai').addEventListener('click', window.onDateOrVenueChange);
+  document.getElementById('raceVenue').addEventListener('change', window.onDateOrVenueChange);
+  document.getElementById('raceDate').addEventListener('change', window.onDateOrVenueChange);
 
   document.getElementById('kaisaiInfo').textContent = '👆 日付・競馬場を選んで検索ボタンを押してください';
 });
