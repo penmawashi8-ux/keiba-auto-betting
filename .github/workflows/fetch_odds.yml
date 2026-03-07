@@ -141,7 +141,7 @@ jobs:
                       best_n = n
                       break
                   pick_ratio = best_n / len(odds_arr)
-                  if spread >= 2.0 and (pick_ratio >= 0.4 or spread >= 3.0):
+                  if True:  # TEST MODE
                     msg = f'Wareme! {race_id} spread={spread:.2f} ratio={pick_ratio:.0%}'
                     try:
                       notify_req = urllib.request.Request(f'https://ntfy.sh/{ntfy_topic}', data=msg.encode(), headers={'Title':'Keiba','Priority':'high'}, method='POST')
