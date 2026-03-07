@@ -71,9 +71,14 @@ var nbList=[];
 for(var i=0;i<portfolio.horses.length;i++){
 var h=portfolio.horses[i];
 var b=portfolio.bets[i];
-var horseHex=((28-h.horse_num*4)>>>0).toString(16).toUpperCase().padStart(2,'0');
-var amt=Math.round(b/100);
-nbList.push('1'+'00'+venue+rHex+'70'+horseHex+'00000000000000'+h.horse_num.toString().padStart(2,'0')+amt);
+var bytes=[0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x00];
+var bitPos=h.horse_num-1;
+if(bitPos<4){bytes[0]=0x10|(0x08>>bitPos);}
+else{var ap=bitPos-4;var bi=1+Math.floor(ap/8);var bb=7-(ap%8);bytes[bi]=(1<<bb);}
+var bitmap='';
+for(var j=0;j<8;j++){bitmap+=('0'+bytes[j].toString(16).toUpperCase()).slice(-2);}
+var amt=('000'+Math.round(b/100).toString()).slice(-3);
+nbList.push('1'+'00'+venue+rHex+'70'+bitmap+amt);
 }
 var data={nb:nbList,total:portfolio.total,ts:Date.now()};
 var url='https://api.github.com/repos/penmawashi8-ux/keiba-auto-betting/contents/bets.json';
