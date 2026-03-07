@@ -6,7 +6,7 @@ var VENUE_CODES = {
   '06':'中山','07':'中京','08':'京都','09':'阪神','10':'小倉'
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('load', function() {
   var today = new Date();
   // 直近の開催日（土日）を探す
   var d = new Date(today);
