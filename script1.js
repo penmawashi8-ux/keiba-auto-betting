@@ -69,3 +69,5 @@ window.onDateOrVenueChange = async function() {
   }
   window.updatePreview();
 };
+window.searchKaisai=searchKaisai;
+
