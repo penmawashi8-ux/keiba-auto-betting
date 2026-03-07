@@ -79,7 +79,9 @@ async function handleFetchOdds() {
     if(!oddsRes.ok) throw new Error('HTTP ' + oddsRes.status);
     oddsData = await oddsRes.json();
     oddsData.race_id = raceId;
+    console.log('netkeiba status='+oddsData.status+' race_id='+oddsData.race_id);
   } catch(e) {
+    console.log('netkeiba error:'+e.message);
     // CORSエラーならActionsにフォールバック
     try {
       var ghToken = localStorage.getItem('gh_token');
