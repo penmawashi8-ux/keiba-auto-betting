@@ -49,7 +49,22 @@ function triggerActions() {
 }
 
 async function handleFetchOdds() {
-  await window.onDateOrVenueChange();
+  // kaisai情報を更新してからrace_id取得
+  var date = document.getElementById('raceDate').value;
+  var venueCode = document.getElementById('raceVenue').value;
+  if(date && venueCode) {
+    try {
+      var yyyymmdd = date.replace(/-/g,'');
+      var res = await fetch('kaisai.json?t='+Date.now());
+      var kaisai = await res.json();
+      if(kaisai[yyyymmdd] && kaisai[yyyymmdd][venueCode]) {
+        var info = kaisai[yyyymmdd][venueCode];
+        window._kaisaiTimes = info.times;
+        window._kaisaiDay = info.day;
+        window._kaisaiSampleId = info.sample_race_id || null;
+      }
+    } catch(e) {}
+  }
   var raceId = getRaceId();
   if (!raceId || raceId.length !== 12) {
     showError('race_id not ready');
