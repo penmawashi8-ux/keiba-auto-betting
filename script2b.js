@@ -74,7 +74,7 @@ var h=portfolio.horses[i];
 var b=portfolio.bets[i];
 var bit=bits[h.horse_num-1]||0;
 var bitHex=bit.toString(16).toUpperCase().padStart(4,'0');
-var amtHex=Math.round(b/100).toString(16).toUpperCase().padStart(4,'0');
+var amtHex=('0000'+Math.round(b/100).toString(16).toUpperCase()).slice(-4);
 nbList.push('1'+'00'+venue+rHex+'701'+'8'+bitHex+'00000000000'+amtHex);
 }
 var data={nb:nbList,total:portfolio.total,ts:Date.now()};
