@@ -55,7 +55,7 @@ async function handleFetchOdds() {
   if(date && venueCode) {
     try {
       var yyyymmdd = date.replace(/-/g,'');
-      var res = await fetch('kaisai.json?t='+Date.now());
+      var res = await fetch('https://raw.githubusercontent.com/penmawashi8-ux/keiba-auto-betting/main/kaisai.json?t='+Date.now());
       var kaisai = await res.json();
       if(kaisai[yyyymmdd] && kaisai[yyyymmdd][venueCode]) {
         var info = kaisai[yyyymmdd][venueCode];
@@ -66,6 +66,42 @@ async function handleFetchOdds() {
     } catch(e) {}
   }
   var raceId = getRaceId();
+  if (!raceId || raceId.length !== 12) { showError('race_id not ready'); return; }
+
+  // GitHub Actionsでオッズ取得
+  showLoading(true);
+  document.getElementById('outputSection').style.display = 'none';
+  document.getElementById('loading').textContent = 'オッズ取得中... (約30秒)';
+  try {
+    var ghToken = localStorage.getItem('gh_token') || prompt('GitHub Token:');
+    if(ghToken) localStorage.setItem('gh_token', ghToken);
+    var dispatchRes = await fetch('https://api.github.com/repos/penmawashi8-ux/keiba-auto-betting/actions/workflows/fetch_odds.yml/dispatches', {
+      method: 'POST',
+      headers: { Authorization: 'token ' + ghToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ref: 'main', inputs: { race_id: raceId } })
+    });
+    if(!dispatchRes.ok) throw new Error('Actions起動失敗: ' + dispatchRes.status);
+
+    // 完了を待つ（最大60秒）
+    var waited = 0;
+    var oddsData = null;
+    while(waited < 60) {
+      await new Promise(r => setTimeout(r, 5000));
+      waited += 5;
+      document.getElementById('loading').textContent = 'オッズ取得中... (' + waited + '秒)';
+      try {
+        var oddsRes = await fetch('https://raw.githubusercontent.com/penmawashi8-ux/keiba-auto-betting/main/odds.json?t='+Date.now());
+        var od = await oddsRes.json();
+        if(od.race_id === raceId) { oddsData = od; break; }
+      } catch(e) {}
+    }
+    if(!oddsData) throw new Error('タイムアウト: オッズ取得できませんでした');
+    document.getElementById('loading').textContent = 'オッズ取得中...';
+  } catch(e) {
+    showError(e.message);
+    showLoading(false);
+    return;
+  }
   if (!raceId || raceId.length !== 12) {
     showError('race_id not ready');
     return;
