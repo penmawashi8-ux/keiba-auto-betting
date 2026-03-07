@@ -67,7 +67,7 @@ jobs:
             target_races = [race_id_input]
           else:
             # auto: 5-10min before start
-            if False:  # TEST
+            if now_min < 600 or now_min > 990:
               print('Outside hours')
               exit(0)
             if today not in result or not result[today]:
@@ -141,7 +141,7 @@ jobs:
                       best_n = n
                       break
                   pick_ratio = best_n / len(odds_arr)
-                  if True:  # TEST MODE
+                  if spread >= 2.0 and (pick_ratio >= 0.4 or spread >= 3.0):
                     msg = f'Wareme! {race_id} spread={spread:.2f} ratio={pick_ratio:.0%}'
                     try:
                       notify_req = urllib.request.Request(f'https://ntfy.sh/{ntfy_topic}', data=msg.encode(), headers={'Title':'Keiba','Priority':'high'}, method='POST')
