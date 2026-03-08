@@ -241,7 +241,7 @@ function handleApproval(){
   },1000);
 }
 
-async function triggerActionsAndReload(raceId){
+async function triggerActionsAndReload(raceId){ return;
   var status=document.getElementById('approvalStatus');
   status.textContent='Starting Actions...';
   var token=getGhToken();
