@@ -51,7 +51,7 @@ jobs:
               for rid in re.findall(r'race_id=(\d{12})', html):
                 if rid[:4] == yyyymmdd[:4]:
                   vc = rid[4:6]
-                  if vc not in result[yyyymmdd]:
+                  if vc not in result[yyyymmdd] or rid[8:10] > result[yyyymmdd][vc]['day']:
                     result[yyyymmdd][vc] = {'times': rid[6:8], 'day': rid[8:10], 'sample_race_id': rid}
                     print(f'kaisai: {yyyymmdd} vc={vc} rid={rid}')
             except Exception as e:
