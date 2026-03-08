@@ -78,7 +78,8 @@ else{var ap=bitPos-4;var bi=1+Math.floor(ap/8);var bb=7-(ap%8);bytes[bi]=(1<<bb)
 var bitmap='';
 for(var j=0;j<8;j++){bitmap+=('0'+bytes[j].toString(16).toUpperCase()).slice(-2);}
 var amt=('000'+Math.round(b/100).toString()).slice(-3);
-nbList.push('1'+'00'+venue+rHex+'70'+bitmap+amt);
+var idx=('000'+i).slice(-3);
+nbList.push('1'+idx+venue+rHex+'70'+bitmap+amt);
 }
 var data={nb:nbList,total:portfolio.total,ts:Date.now()};
 var url='https://api.github.com/repos/penmawashi8-ux/keiba-auto-betting/contents/bets.json';
