@@ -170,7 +170,7 @@ window.cachedPortfolio = portfolio;
 }
 
 async function loadOddsJson(expectedRaceId) {
-  var url = 'odds.json?t=' + Date.now();
+  var url = 'https://raw.githubusercontent.com/penmawashi8-ux/keiba-auto-betting/main/odds.json?t=' + Date.now();
   var res = await fetch(url);
   if (!res.ok) {
     throw new Error('odds.json not found (HTTP ' + res.status + ')');
