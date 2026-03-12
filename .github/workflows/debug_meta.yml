@@ -1,0 +1,14 @@
+name: DebugMeta
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Debug
+        run: |
+          pip install requests --quiet
+          python3 debug_meta.py
