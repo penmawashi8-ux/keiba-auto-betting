@@ -1,4 +1,0 @@
-- name: Debug
-  run: |
-    pip install requests --quiet
-    python3 debug_raceid.py
