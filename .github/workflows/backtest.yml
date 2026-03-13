@@ -3,14 +3,10 @@ name: Backtest
 on:
   workflow_dispatch:
     inputs:
-      start_date:
-        description: '開始日 (YYYYMMDD)'
-        required: false
-        default: ''
-      end_date:
-        description: '終了日 (YYYYMMDD)'
-        required: false
-        default: ''
+      year:
+        description: '対象年 (例: 2024)'
+        required: true
+        default: '2024'
 
 jobs:
   backtest:
@@ -20,19 +16,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Debug race ID format
-        run: |
-          pip install requests --quiet
-          python3 debug_raceid.py
+      - name: Install dependencies
+        run: pip install requests --quiet
 
       - name: Run backtest
-        run: |
-          python3 backtest.py "${{ github.event.inputs.start_date }}" "${{ github.event.inputs.end_date }}"
+        run: python3 backtest.py ${{ github.event.inputs.year }}0101 ${{ github.event.inputs.year }}1231 backtest_${{ github.event.inputs.year }}.csv
 
-      - name: Commit results
+      - name: Commit result
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add backtest_result.csv backtest_summary.txt 2>/dev/null || true
-          git diff --staged --quiet || git commit -m "backtest result"
+          git add backtest_${{ github.event.inputs.year }}.csv
+          git diff --staged --quiet || git commit -m "backtest ${{ github.event.inputs.year }}"
           git push
