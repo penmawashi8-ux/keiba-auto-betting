@@ -1,27 +1,111 @@
-total: 54992 rows (with meta: 0)
+total: 54992 rows (with meta: 52973)
 
 ======================================================================
 [1] Turf vs Dirt (top1 100yen win)
 ======================================================================
+  Turf                                               26448R  ROI=  78.4%  hit= 32.8%  profit=-571,962
+  Dirt                                               26525R  ROI=  78.6%  hit= 33.0%  profit=-567,117
 
 ======================================================================
 [2] Distance band (top1 100yen win)
 ======================================================================
+  sprint(~1200) Turf                                 5345R  ROI=  75.3%  hit= 28.7%  profit=-132,148
+  sprint(~1200) Dirt                                 6913R  ROI=  80.9%  hit= 33.0%  profit=-131,727
+  sprint(~1200) All                                  12258R  ROI=  78.5%  hit= 31.1%  profit=-263,875
+  mile(1201-1600) Turf                               7753R  ROI=  80.6%  hit= 33.1%  profit=-150,146
+  mile(1201-1600) Dirt                               6645R  ROI=  77.9%  hit= 32.6%  profit=-147,098
+  mile(1201-1600) All                                14398R  ROI=  79.4%  hit= 32.9%  profit=-297,244
+  middle(1601-2000) Turf                             10290R  ROI=  76.7%  hit= 33.8%  profit=-239,266
+  middle(1601-2000) Dirt                             12047R  ROI=  78.0%  hit= 33.6%  profit=-265,084
+  middle(1601-2000) All                              22337R  ROI=  77.4%  hit= 33.6%  profit=-504,350
+  long(2001-2400) Turf                               2128R  ROI=  82.4%  hit= 36.9%  profit=-37,556
+  long(2001-2400) Dirt                                878R  ROI=  74.9%  hit= 29.8%  profit=-22,046
+  long(2001-2400) All                                3006R  ROI=  80.2%  hit= 34.8%  profit=-59,602
+  ultralong(2401~) Turf                               932R  ROI=  86.2%  hit= 33.9%  profit=-12,846
+  ultralong(2401~) Dirt                                42R  ROI=  72.3%  hit= 28.6%  profit=-1,162
+  ultralong(2401~) All                                974R  ROI=  85.6%  hit= 33.7%  profit=-14,008
 
 ======================================================================
 [3] Race class (top1 100yen win)
 ======================================================================
+  Maiden-debut                                       4909R  ROI=  80.6%  hit= 34.5%  profit=-95,397
+  Maiden                                             18475R  ROI=  77.2%  hit= 34.3%  profit=-421,052
+  1win                                               12130R  ROI=  80.3%  hit= 32.6%  profit=-239,066
+  2win                                               6092R  ROI=  85.0%  hit= 35.5%  profit=-91,146
+  3win                                               2712R  ROI=  80.9%  hit= 30.3%  profit=-51,678
+  Open                                               4047R  ROI=  73.1%  hit= 27.8%  profit=-108,816
+  G1                                                 4608R  ROI=  71.4%  hit= 29.2%  profit=-131,924
 
 ======================================================================
 [4] Venue (top1 100yen win)
 ======================================================================
+  中京                                                 5968R  ROI=  79.1%  hit= 33.0%  profit=-124,566
+  中山                                                 7603R  ROI=  79.4%  hit= 34.0%  profit=-156,680
+  京都                                                 5902R  ROI=  75.1%  hit= 32.1%  profit=-147,084
+  函館                                                 2304R  ROI=  79.6%  hit= 33.2%  profit=-47,042
+  小倉                                                 4138R  ROI=  75.4%  hit= 29.9%  profit=-101,862
+  新潟                                                 4826R  ROI=  81.0%  hit= 31.9%  profit=-91,872
+  札幌                                                 2592R  ROI=  81.2%  hit= 33.9%  profit=-48,776
+  東京                                                 8432R  ROI=  80.3%  hit= 35.1%  profit=-166,282
+  福島                                                 3344R  ROI=  73.4%  hit= 27.8%  profit=-88,952
+  阣神                                                 7864R  ROI=  78.9%  hit= 34.2%  profit=-165,963
 
 ======================================================================
 [5] Combo conditions (>=30 races, sorted by ROI)
 ======================================================================
+  Dirt / long(2001-2400) / 3win                        64R  ROI= 139.6% ***  hit= 53.1%  profit=+2,536
+  Turf / long(2001-2400) / 2win                       310R  ROI=  95.7% *  hit= 44.8%  profit=-1,322
+  Turf / ultralong(2401~) / G1                         86R  ROI=  93.5%  hit= 37.2%  profit=-560
+  Dirt / sprint(~1200) / 3win                         296R  ROI=  92.4%  hit= 32.4%  profit=-2,244
+  Turf / ultralong(2401~) / 1win                      262R  ROI=  91.5%  hit= 34.4%  profit=-2,222
+  Dirt / mile(1201-1600) / 2win                       782R  ROI=  89.2%  hit= 34.8%  profit=-8,484
+  Turf / ultralong(2401~) / Maiden                    140R  ROI=  88.7%  hit= 31.4%  profit=-1,582
+  Turf / ultralong(2401~) / Open                      198R  ROI=  88.4%  hit= 33.3%  profit=-2,296
+  Dirt / middle(1601-2000) / 2win                    1336R  ROI=  88.2%  hit= 37.4%  profit=-15,782
+  Dirt / middle(1601-2000) / 3win                     530R  ROI=  87.1%  hit= 33.2%  profit=-6,852
+  Turf / long(2001-2400) / 1win                       542R  ROI=  85.9%  hit= 38.4%  profit=-7,632
+  Turf / sprint(~1200) / 2win                         642R  ROI=  85.3%  hit= 30.8%  profit=-9,406
+  Dirt / sprint(~1200) / Maiden-debut                 425R  ROI=  85.3%  hit= 33.4%  profit=-6,248
+  Dirt / mile(1201-1600) / 1win                      1542R  ROI=  85.3%  hit= 33.9%  profit=-22,674
+  Dirt / long(2001-2400) / 2win                       168R  ROI=  85.2%  hit= 34.5%  profit=-2,486
+  Dirt / sprint(~1200) / 2win                         709R  ROI=  84.3%  hit= 32.0%  profit=-11,109
+  Turf / mile(1201-1600) / Maiden-debut              1349R  ROI=  84.1%  hit= 35.2%  profit=-21,388
+  Turf / mile(1201-1600) / 2win                       867R  ROI=  83.6%  hit= 36.0%  profit=-14,222
+  Turf / mile(1201-1600) / Maiden                    2224R  ROI=  82.7%  hit= 35.4%  profit=-38,426
+  Turf / sprint(~1200) / Maiden-debut                 618R  ROI=  82.2%  hit= 33.7%  profit=-11,016
 
 ======================================================================
 [6] Top conditions x spread threshold (>=20 races)
 ======================================================================
+
+  condition: Dirt / long(2001-2400) / 3win
+      spread>=3                                        64R  ROI= 139.6% ***  hit= 53.1%  profit=+2,536
+      spread>=5                                        58R  ROI= 137.2% ***  hit= 51.7%  profit=+2,156
+      spread>=8                                        46R  ROI= 135.6% ***  hit= 52.2%  profit=+1,638
+      spread>=10                                       38R  ROI= 132.6% ***  hit= 52.6%  profit=+1,238
+
+  condition: Turf / long(2001-2400) / 2win
+      spread>=3                                       308R  ROI=  96.4% *  hit= 45.1%  profit=-1,122
+      spread>=5                                       290R  ROI=  94.9%  hit= 45.2%  profit=-1,482
+      spread>=8                                       243R  ROI=  92.2%  hit= 45.3%  profit=-1,902
+      spread>=10                                      183R  ROI=  83.3%  hit= 42.6%  profit=-3,062
+
+  condition: Turf / ultralong(2401~) / G1
+      spread>=3                                        84R  ROI=  95.7% *  hit= 38.1%  profit=-360
+      spread>=5                                        72R  ROI=  80.8%  hit= 33.3%  profit=-1,380
+      spread>=8                                        44R  ROI= 118.2% ***  hit= 50.0%  profit=+800
+      spread>=10                                       28R  ROI= 109.3% ***  hit= 42.9%  profit=+260
+
+  condition: Dirt / sprint(~1200) / 3win
+      spread>=3                                       294R  ROI=  93.0%  hit= 32.7%  profit=-2,044
+      spread>=5                                       252R  ROI=  89.3%  hit= 32.5%  profit=-2,700
+      spread>=8                                       150R  ROI=  97.3% *  hit= 37.3%  profit=-400
+      spread>=10                                      110R  ROI= 105.8% ***  hit= 41.8%  profit=+640
+
+  condition: Turf / ultralong(2401~) / 1win
+      spread>=3                                       250R  ROI=  92.8%  hit= 34.4%  profit=-1,802
+      spread>=5                                       218R  ROI=  92.0%  hit= 33.9%  profit=-1,742
+      spread>=8                                       142R  ROI=  99.4% *  hit= 36.6%  profit=-82
+      spread>=10                                       96R  ROI=  94.4%  hit= 37.5%  profit=-542
 
 * = ROI>=95%  ** = ROI>=100%  *** = ROI>=105%
