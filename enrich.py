@@ -1,4 +1,4 @@
-import requests, re, csv, sys, time
+import requests, re, csv, sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 SESSION = requests.Session()
@@ -21,26 +21,23 @@ def fetch_race_meta(race_id):
         if m2:
             distance = int(m2.group(1))
         race_class = ''
-        for kw, label in [('æ°é¦¬','æ°é¦¬'),('æªåå©','æªåå©'),('1åã¯ã©ã¹','1å'),('2åã¯ã©ã¹','2å'),('3åã¯ã©ã¹','3å'),('ãªã¼ãã³','OP'),('GI','G1'),('GII','G2'),('GIII','G3'),('Gâ ','G1'),('Gâ¡','G2'),('Gâ¢','G3')]:
-            if kw in html:
-                race_class = label
-                break
-        m3 = re.search(r'description[^>]+content="([^"]+)"', html)
-        desc = m3.group(1) if m3 else ''
-        for v in VENUE_MAP.values():
-            if v in desc:
-                venue = v
-                break
-        if distance <= 1200:
-            dist_band = 'ç­è·é¢(~1200)'
-        elif distance <= 1600:
-            dist_band = 'ç­ä¸­è·é¢(1201-1600)'
-        elif distance <= 2000:
-            dist_band = 'ä¸­è·é¢(1601-2000)'
-        elif distance <= 2400:
-            dist_band = 'ä¸­é·è·é¢(2001-2400)'
-        else:
-            dist_band = 'é·è·é¢(2401~)'
+        m3 = re.search(r'class="Race_Name"[^>]*>(.*?)</', html, re.DOTALL)
+        if m3:
+            name = m3.group(1).strip()
+            if 'æ°é¦¬' in name: race_class = 'æ°é¦¬'
+            elif 'æªåå©' in name: race_class = 'æªåå©'
+            elif '1å' in name: race_class = '1å'
+            elif '2å' in name: race_class = '2å'
+            elif '3å' in name: race_class = '3å'
+            elif 'GI' in name or 'G1' in name or 'Gâ ' in name: race_class = 'G1'
+            elif 'GII' in name or 'G2' in name or 'Gâ¡' in name: race_class = 'G2'
+            elif 'GIII' in name or 'G3' in name or 'Gâ¢' in name: race_class = 'G3'
+            else: race_class = 'OP'
+        if distance <= 1200: dist_band = 'ç­è·é¢(~1200)'
+        elif distance <= 1600: dist_band = 'ç­ä¸­è·é¢(1201-1600)'
+        elif distance <= 2000: dist_band = 'ä¸­è·é¢(1601-2000)'
+        elif distance <= 2400: dist_band = 'ä¸­é·è·é¢(2001-2400)'
+        else: dist_band = 'é·è·é¢(2401~)'
         return {'race_id':race_id,'venue':venue,'surface':surface,'distance':distance,'dist_band':dist_band,'race_class':race_class}
     except Exception as e:
         print(f'  [WARN] {race_id}: {e}')
@@ -63,7 +60,6 @@ def run(input_csv='backtest_result.csv', output_csv='enriched.csv'):
             done += 1
             if done % 200 == 0:
                 print(f'  {done}/{len(race_ids)} å®äº...')
-    print(f'ã¡ã¿æå ±åå¾å®äº')
     fieldnames = list(rows[0].keys()) + ['venue','surface','distance','dist_band','race_class']
     with open(output_csv, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
