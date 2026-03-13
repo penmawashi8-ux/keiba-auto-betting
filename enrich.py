@@ -20,7 +20,7 @@ def fetch_race_meta(race_id):
         m2 = re.search(r'<span>(\d{3,4})m</span>', html)
         if m2:
             distance = int(m2.group(1))
-        race_class = ''
+        race_class = 'OP'
         m3 = re.search(r'class="Race_Name"[^>]*>(.*?)</', html, re.DOTALL)
         if m3:
             name = m3.group(1).strip()
@@ -29,10 +29,9 @@ def fetch_race_meta(race_id):
             elif '1å' in name: race_class = '1å'
             elif '2å' in name: race_class = '2å'
             elif '3å' in name: race_class = '3å'
-            elif 'GI' in name or 'G1' in name or 'Gâ ' in name: race_class = 'G1'
-            elif 'GII' in name or 'G2' in name or 'Gâ¡' in name: race_class = 'G2'
-            elif 'GIII' in name or 'G3' in name or 'Gâ¢' in name: race_class = 'G3'
-            else: race_class = 'OP'
+            elif 'Gâ ' in name or 'GI' in name: race_class = 'G1'
+            elif 'Gâ¡' in name or 'GII' in name: race_class = 'G2'
+            elif 'Gâ¢' in name or 'GIII' in name: race_class = 'G3'
         if distance <= 1200: dist_band = 'ç­è·é¢(~1200)'
         elif distance <= 1600: dist_band = 'ç­ä¸­è·é¢(1201-1600)'
         elif distance <= 2000: dist_band = 'ä¸­è·é¢(1601-2000)'
@@ -49,7 +48,7 @@ def run(input_csv='backtest_result.csv', output_csv='enriched.csv'):
         rows = list(csv.DictReader(f))
     print(f'åãã¼ã¿: {len(rows)}è¡')
     race_ids = list(dict.fromkeys(r['race_id'] for r in rows))
-    print(f'ã¦ãã¼ã¯race_id: {len(race_ids)}ä»¶')
+    print(f'ã¦ãã¼race_id: {len(race_ids)}ä»¶')
     meta = {}
     with ThreadPoolExecutor(max_workers=15) as ex:
         futures = {ex.submit(fetch_race_meta, rid): rid for rid in race_ids}
