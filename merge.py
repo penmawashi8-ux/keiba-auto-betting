@@ -2,6 +2,7 @@ import csv, glob, sys
 
 def merge(pattern, out):
     files = sorted(glob.glob(pattern))
+    files = [f for f in files if 'all' not in f]
     print(f'found: {files}')
     rows = []
     for f in files:
