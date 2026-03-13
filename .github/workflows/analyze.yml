@@ -4,9 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       input_csv:
-        description: 'input CSV filename'
+        description: 'Input CSV file'
         required: true
         default: 'backtest_all_enriched.csv'
+      script:
+        description: 'Script to run (analyze2.py or analyze3.py)'
+        required: true
+        default: 'analyze3.py'
 
 jobs:
   analyze:
@@ -16,13 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run analyze
-        run: python3 analyze2.py ${{ github.event.inputs.input_csv }} | tee analyze_result.txt
+      - name: Run analysis
+        run: python3 ${{ github.event.inputs.script }} ${{ github.event.inputs.input_csv }} > analyze_result.txt 2>&1
 
       - name: Commit result
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add analyze_result.txt
-          git diff --staged --quiet || git commit -m "analyze ${{ github.event.inputs.input_csv }}"
+          git diff --staged --quiet || git commit -m "analyze ${{ github.event.inputs.input_csv }} with ${{ github.event.inputs.script }}"
           git push
