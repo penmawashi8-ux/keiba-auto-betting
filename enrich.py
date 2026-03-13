@@ -1,85 +1,58 @@
-"""
-backtest_result.csv に芝/ダート・距離・競馬場・クラスを付加して enriched.csv を作成
-"""
 import requests, re, csv, sys, time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 SESSION = requests.Session()
-SESSION.headers.update({
-    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15',
-    'Referer': 'https://race.netkeiba.com/',
-})
+SESSION.headers.update({'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15', 'Referer': 'https://race.netkeiba.com/'})
 
-VENUE_MAP = {
-    '01':'札幌','02':'函館','03':'福島','04':'新潟','05':'東京',
-    '06':'中山','07':'中京','08':'京都','09':'阪神','10':'小倉',
-}
+VENUE_MAP = {'01':'æ­å¹','02':'å½é¤¨','03':'ç¦å³¶','04':'æ°æ½','05':'æ±äº¬','06':'ä¸­å±±','07':'ä¸­äº¬','08':'äº¬é½','09':'éªç¥','10':'å°å'}
 
 def fetch_race_meta(race_id):
-    """レースの芝/ダート・距離・競馬場・クラスを取得"""
     url = f'https://race.netkeiba.com/race/shutuba.html?race_id={race_id}'
     try:
         r = SESSION.get(url, timeout=15)
         html = r.content.decode('euc-jp', errors='replace')
-
-        # 競馬場コード (race_idの5-6桁目)
-        venue_code = race_id[4:6]
-        venue = VENUE_MAP.get(venue_code, venue_code)
-
-        # 芝/ダート・距離: "芝1600m" or "ダ1200m" のパターン
-        surface, distance = '', 0
-        m = re.search(r'(芝|ダ[ーｰ]?ト?)[\s　]*(\d{3,4})\s*m', html)
+        venue = VENUE_MAP.get(race_id[4:6], race_id[4:6])
+        surface = ''
+        m = re.search(r'class="(Dirt|Turf)">', html)
         if m:
-            surface = '芝' if m.group(1) == '芝' else 'ダート'
-            distance = int(m.group(2))
-
-        # クラス: 新馬/未勝利/1勝/2勝/3勝/オープン/G1/G2/G3
+            surface = 'ãã¼ã' if m.group(1) == 'Dirt' else 'è'
+        distance = 0
+        m2 = re.search(r'<span>(\d{3,4})m</span>', html)
+        if m2:
+            distance = int(m2.group(1))
         race_class = ''
-        for kw, label in [
-            ('新馬', '新馬'), ('未勝利', '未勝利'),
-            ('1勝クラス', '1勝'), ('2勝クラス', '2勝'), ('3勝クラス', '3勝'),
-            ('オープン', 'OP'), ('GⅠ', 'G1'), ('GⅡ', 'G2'), ('GⅢ', 'G3'),
-            ('G1', 'G1'), ('G2', 'G2'), ('G3', 'G3'),
-        ]:
+        for kw, label in [('æ°é¦¬','æ°é¦¬'),('æªåå©','æªåå©'),('1åã¯ã©ã¹','1å'),('2åã¯ã©ã¹','2å'),('3åã¯ã©ã¹','3å'),('ãªã¼ãã³','OP'),('GI','G1'),('GII','G2'),('GIII','G3'),('Gâ ','G1'),('Gâ¡','G2'),('Gâ¢','G3')]:
             if kw in html:
                 race_class = label
                 break
-
-        # 距離帯
+        m3 = re.search(r'description[^>]+content="([^"]+)"', html)
+        desc = m3.group(1) if m3 else ''
+        for v in VENUE_MAP.values():
+            if v in desc:
+                venue = v
+                break
         if distance <= 1200:
-            dist_band = '短距離(~1200)'
+            dist_band = 'ç­è·é¢(~1200)'
         elif distance <= 1600:
-            dist_band = '短中距離(1201-1600)'
+            dist_band = 'ç­ä¸­è·é¢(1201-1600)'
         elif distance <= 2000:
-            dist_band = '中距離(1601-2000)'
+            dist_band = 'ä¸­è·é¢(1601-2000)'
         elif distance <= 2400:
-            dist_band = '中長距離(2001-2400)'
+            dist_band = 'ä¸­é·è·é¢(2001-2400)'
         else:
-            dist_band = '長距離(2401~)'
-
-        return {
-            'race_id':   race_id,
-            'venue':     venue,
-            'surface':   surface,
-            'distance':  distance,
-            'dist_band': dist_band,
-            'race_class': race_class,
-        }
+            dist_band = 'é·è·é¢(2401~)'
+        return {'race_id':race_id,'venue':venue,'surface':surface,'distance':distance,'dist_band':dist_band,'race_class':race_class}
     except Exception as e:
         print(f'  [WARN] {race_id}: {e}')
-        return {'race_id': race_id, 'venue': '', 'surface': '', 'distance': 0, 'dist_band': '', 'race_class': ''}
+        return {'race_id':race_id,'venue':'','surface':'','distance':0,'dist_band':'','race_class':''}
 
 def run(input_csv='backtest_result.csv', output_csv='enriched.csv'):
-    # 元CSV読み込み
     rows = []
     with open(input_csv, encoding='utf-8-sig') as f:
         rows = list(csv.DictReader(f))
-    print(f'元データ: {len(rows)}行')
-
-    # ユニークなrace_idだけメタ情報を取得
+    print(f'åãã¼ã¿: {len(rows)}è¡')
     race_ids = list(dict.fromkeys(r['race_id'] for r in rows))
-    print(f'ユニークrace_id: {len(race_ids)}件 → メタ情報取得中...')
-
+    print(f'ã¦ãã¼ã¯race_id: {len(race_ids)}ä»¶')
     meta = {}
     with ThreadPoolExecutor(max_workers=15) as ex:
         futures = {ex.submit(fetch_race_meta, rid): rid for rid in race_ids}
@@ -88,28 +61,18 @@ def run(input_csv='backtest_result.csv', output_csv='enriched.csv'):
             result = future.result()
             meta[result['race_id']] = result
             done += 1
-            if done % 100 == 0:
-                print(f'  {done}/{len(race_ids)} 完了...')
-
-    print(f'メタ情報取得完了')
-
-    # 元データにメタ情報を結合して保存
-    fieldnames = list(rows[0].keys()) + ['venue', 'surface', 'distance', 'dist_band', 'race_class']
+            if done % 200 == 0:
+                print(f'  {done}/{len(race_ids)} å®äº...')
+    print(f'ã¡ã¿æå ±åå¾å®äº')
+    fieldnames = list(rows[0].keys()) + ['venue','surface','distance','dist_band','race_class']
     with open(output_csv, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for row in rows:
             m = meta.get(row['race_id'], {})
-            row.update({
-                'venue':      m.get('venue', ''),
-                'surface':    m.get('surface', ''),
-                'distance':   m.get('distance', 0),
-                'dist_band':  m.get('dist_band', ''),
-                'race_class': m.get('race_class', ''),
-            })
+            row.update({'venue':m.get('venue',''),'surface':m.get('surface',''),'distance':m.get('distance',0),'dist_band':m.get('dist_band',''),'race_class':m.get('race_class','')})
             writer.writerow(row)
-
-    print(f'{output_csv} 保存完了 ({len(rows)}行)')
+    print(f'{output_csv} ä¿å­å®äº ({len(rows)}è¡)')
 
 if __name__ == '__main__':
     inp = sys.argv[1] if len(sys.argv) > 1 else 'backtest_result.csv'
