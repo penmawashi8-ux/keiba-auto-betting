@@ -1,182 +1,276 @@
 total: 54992 rows (with meta: 52973)
 
-========================================================================
-[A] top1_odds filter (1ban odds >= threshold, top1 100yen bet)
-========================================================================
-  top1_odds >= 1.0                                             52973R  ROI=  78.5%  hit= 32.9%  profit=-1,139,079
-  top1_odds >= 1.5                                             50672R  ROI=  78.1%  hit= 31.4%  profit=-1,108,209
-  top1_odds >= 2.0                                             40863R  ROI=  78.1%  hit= 28.0%  profit=-893,519
-  top1_odds >= 2.5                                             29411R  ROI=  77.8%  hit= 24.9%  profit=-653,219
-  top1_odds >= 3.0                                             17620R  ROI=  76.8%  hit= 21.9%  profit=-408,019
-  top1_odds >= 4.0                                             3892R  ROI=  71.1%  hit= 16.3%  profit=-112,509
-  top1_odds >= 5.0                                              403R  ROI=  67.0%  hit= 12.7%  profit=-13,315
+===========================================================================
+[E] Top conditions x YEAR (odds>=3.0, top1 100yen)
+===========================================================================
 
---- [A] odds filter x combo (>=30R) ---
+  Turf / mile(1201-1600) / Maiden-debut  (total: 358R)
+      2018                                                            38R  ROI=  73.2%  hit= 21.1%  profit=-1,020
+      2019                                                            32R  ROI= 108.7% ***  hit= 31.2%  profit=+278
+      2020                                                            54R  ROI= 108.5% ***  hit= 29.6%  profit=+460
+      2021                                                            42R  ROI= 131.4% ***  hit= 38.1%  profit=+1,320
+      2022                                                            52R  ROI= 119.6% ***  hit= 34.6%  profit=+1,020
+      2023                                                            46R  ROI= 110.0% ***  hit= 30.4%  profit=+460
+      2024                                                            44R  ROI= 155.5% ***  hit= 45.5%  profit=+2,440
+      2025                                                            50R  ROI= 114.4% ***  hit= 32.0%  profit=+720
 
-  --- odds >= 2.0 ---
-    Dirt / long(2001-2400) / 3win                                54R  ROI= 138.1% ***  hit= 48.1%  profit=+2,056
-    Turf / long(2001-2400) / 2win                               209R  ROI=  95.0% *  hit= 36.8%  profit=-1,042
-    Turf / ultralong(2401~) / Open                              170R  ROI=  94.1%  hit= 32.9%  profit=-996
-    Turf / ultralong(2401~) / Maiden                            122R  ROI=  92.8%  hit= 31.1%  profit=-882
-    Dirt / sprint(~1200) / 3win                                 266R  ROI=  91.6%  hit= 29.3%  profit=-2,224
-    Turf / ultralong(2401~) / 1win                              226R  ROI=  91.3%  hit= 31.0%  profit=-1,962
-    Turf / ultralong(2401~) / G1                                 82R  ROI=  89.8%  hit= 34.1%  profit=-840
-    Dirt / mile(1201-1600) / 2win                               672R  ROI=  88.4%  hit= 31.2%  profit=-7,764
-    Dirt / middle(1601-2000) / 3win                             448R  ROI=  88.1%  hit= 29.9%  profit=-5,312
-    Turf / long(2001-2400) / 3win                               146R  ROI=  87.7%  hit= 30.1%  profit=-1,800
+  Turf / ultralong(2401~) / 1win  (total: 94R)
+      2019                                                            12R  ROI= 125.0% ***  hit= 33.3%  profit=+300
+      2020                                                            12R  ROI=  53.3%  hit= 16.7%  profit=-560
+      2021                                                            14R  ROI= 132.9% ***  hit= 42.9%  profit=+460
+      2022                                                            20R  ROI= 110.0% ***  hit= 30.0%  profit=+200
+      2023                                                            12R  ROI= 171.7% ***  hit= 50.0%  profit=+860
+      2024                                                            16R  ROI= 135.0% ***  hit= 37.5%  profit=+560
+      2025                                                             8R  ROI= 110.0% ***  hit= 25.0%  profit=+80
 
-  --- odds >= 2.5 ---
-    Dirt / long(2001-2400) / 3win                                38R  ROI= 161.6% ***  hit= 52.6%  profit=+2,340
-    Turf / long(2001-2400) / 3win                               100R  ROI= 101.0% **  hit= 32.0%  profit=+100
-    Turf / ultralong(2401~) / 1win                              172R  ROI= 100.2% **  hit= 31.4%  profit=+40
-    Turf / ultralong(2401~) / Maiden                             92R  ROI=  99.3% *  hit= 30.4%  profit=-60
-    Turf / long(2001-2400) / 2win                               117R  ROI=  98.3% *  hit= 33.3%  profit=-200
-    Turf / mile(1201-1600) / Maiden-debut                       688R  ROI=  93.1%  hit= 29.4%  profit=-4,742
-    Dirt / sprint(~1200) / 3win                                 222R  ROI=  92.0%  hit= 27.0%  profit=-1,782
-    Turf / sprint(~1200) / Maiden-debut                         324R  ROI=  91.2%  hit= 29.0%  profit=-2,842
-    Turf / ultralong(2401~) / Open                              132R  ROI=  91.1%  hit= 28.8%  profit=-1,172
-    Turf / middle(1601-2000) / 3win                             293R  ROI=  89.6%  hit= 28.0%  profit=-3,044
+  Turf / ultralong(2401~) / Maiden  (total: 52R)
+      2018                                                             4R  ROI= 155.0% ***  hit= 50.0%  profit=+220
+      2019                                                             4R  ROI= 355.0% ***  hit=100.0%  profit=+1,020
+      2020                                                             6R  ROI= 253.3% ***  hit= 66.7%  profit=+920
+      2021                                                             6R  ROI= 263.3% ***  hit= 66.7%  profit=+980
+      2022                                                             4R  ROI=   0.0%  hit=  0.0%  profit=-400
+      2023                                                             8R  ROI=   0.0%  hit=  0.0%  profit=-800
+      2024                                                             8R  ROI=  85.0%  hit= 25.0%  profit=-120
+      2025                                                            12R  ROI=  50.0%  hit= 16.7%  profit=-600
 
-  --- odds >= 3.0 ---
-    Dirt / long(2001-2400) / 3win                                26R  ROI= 132.3% ***  hit= 38.5%  profit=+840
-    Turf / ultralong(2401~) / Maiden                             52R  ROI= 123.5% ***  hit= 34.6%  profit=+1,220
-    Turf / ultralong(2401~) / 1win                               94R  ROI= 120.2% ***  hit= 34.0%  profit=+1,900
-    Turf / mile(1201-1600) / Maiden-debut                       358R  ROI= 115.9% ***  hit= 33.0%  profit=+5,678
-    Turf / long(2001-2400) / 2win                                52R  ROI= 111.5% ***  hit= 34.6%  profit=+600
-    Turf / sprint(~1200) / Maiden-debut                         160R  ROI= 110.1% ***  hit= 31.2%  profit=+1,618
-    Dirt / sprint(~1200) / Maiden-debut                         132R  ROI= 104.2% **  hit= 28.8%  profit=+558
-    Turf / middle(1601-2000) / 3win                             181R  ROI= 103.7% **  hit= 29.8%  profit=+676
-    Turf / long(2001-2400) / 3win                                54R  ROI=  95.9% *  hit= 25.9%  profit=-220
-    Dirt / sprint(~1200) / 2win                                 311R  ROI=  94.5%  hit= 27.3%  profit=-1,697
+  Dirt / middle(1601-2000) / 3win  (total: 258R)
+      2019                                                            14R  ROI= 197.1% ***  hit= 57.1%  profit=+1,360
+      2020                                                            37R  ROI=  38.9%  hit= 10.8%  profit=-2,260
+      2021                                                            48R  ROI=  64.5%  hit= 16.7%  profit=-1,702
+      2022                                                            44R  ROI=  63.6%  hit= 18.2%  profit=-1,600
+      2023                                                            36R  ROI=  40.0%  hit= 11.1%  profit=-2,160
+      2024                                                            40R  ROI= 110.9% ***  hit= 30.0%  profit=+436
+      2025                                                            39R  ROI= 122.6% ***  hit= 35.9%  profit=+880
 
-========================================================================
-[C] 4-way combo: venue x surface x dist_band x class (>=30R, top20 by ROI)
-========================================================================
-  京都 / Dirt / sprint(~1200) / 3win                               39R  ROI= 148.7% ***  hit= 56.4%  profit=+1,900
-  中山 / Turf / sprint(~1200) / Maiden-debut                       52R  ROI= 146.9% ***  hit= 50.0%  profit=+2,438
-  東京 / Dirt / long(2001-2400) / 3win                             64R  ROI= 139.6% ***  hit= 53.1%  profit=+2,536
-  新潟 / Dirt / sprint(~1200) / 3win                               32R  ROI= 131.2% ***  hit= 43.8%  profit=+998
-  福島 / Dirt / sprint(~1200) / Maiden-debut                       32R  ROI= 124.9% ***  hit= 50.0%  profit=+798
-  新潟 / Turf / mile(1201-1600) / Open                             98R  ROI= 123.8% ***  hit= 40.8%  profit=+2,336
-  中山 / Turf / sprint(~1200) / Open                               99R  ROI= 123.4% ***  hit= 43.4%  profit=+2,316
-  新潟 / Dirt / middle(1601-2000) / 3win                           34R  ROI= 122.4% ***  hit= 41.2%  profit=+760
-  阣神 / Turf / sprint(~1200) / Maiden                             56R  ROI= 118.9% ***  hit= 46.4%  profit=+1,058
-  京都 / Turf / long(2001-2400) / 2win                             65R  ROI= 118.7% ***  hit= 56.9%  profit=+1,218
-  阣神 / Dirt / sprint(~1200) / G1                                 76R  ROI= 118.4% ***  hit= 42.1%  profit=+1,400
-  新潟 / Turf / middle(1601-2000) / 3win                           36R  ROI= 117.8% ***  hit= 44.4%  profit=+640
-  新潟 / Turf / sprint(~1200) / 2win                               74R  ROI= 117.5% ***  hit= 40.5%  profit=+1,298
-  京都 / Dirt / mile(1201-1600) / 3win                             38R  ROI= 117.3% ***  hit= 36.8%  profit=+658
-  函館 / Dirt / sprint(~1200) / Maiden-debut                       30R  ROI= 116.7% ***  hit= 46.7%  profit=+500
-  札幌 / Turf / mile(1201-1600) / Maiden-debut                     60R  ROI= 116.3% ***  hit= 46.7%  profit=+980
-  函館 / Dirt / middle(1601-2000) / 2win                           68R  ROI= 115.5% ***  hit= 50.0%  profit=+1,056
-  中山 / Turf / sprint(~1200) / 2win                              102R  ROI= 113.9% ***  hit= 43.1%  profit=+1,416
-  中京 / Turf / sprint(~1200) / 3win                               34R  ROI= 112.9% ***  hit= 41.2%  profit=+438
-  札幌 / Turf / mile(1201-1600) / 1win                             68R  ROI= 110.9% ***  hit= 41.2%  profit=+740
+  Dirt / long(2001-2400) / 3win  (total: 26R)
+      2020                                                             4R  ROI= 150.0% ***  hit= 50.0%  profit=+200
+      2021                                                            10R  ROI=  62.0%  hit= 20.0%  profit=-380
+      2022                                                             6R  ROI= 133.3% ***  hit= 33.3%  profit=+200
 
-========================================================================
-[D] Year-by-year ROI for top 3-way combos (sorted by min-year ROI)
-========================================================================
+  Turf / sprint(~1200) / Maiden-debut  (total: 160R)
+      2018                                                            18R  ROI=  93.3%  hit= 22.2%  profit=-120
+      2019                                                            20R  ROI=  74.0%  hit= 20.0%  profit=-520
+      2020                                                            22R  ROI= 165.5% ***  hit= 45.5%  profit=+1,440
+      2021                                                            26R  ROI=  76.2%  hit= 23.1%  profit=-620
+      2022                                                            16R  ROI= 133.6% ***  hit= 37.5%  profit=+538
+      2023                                                            20R  ROI=  73.0%  hit= 20.0%  profit=-540
+      2024                                                            26R  ROI= 150.8% ***  hit= 46.2%  profit=+1,320
+      2025                                                            12R  ROI= 110.0% ***  hit= 33.3%  profit=+120
 
-  Turf / mile(1201-1600) / Maiden-debut  (avg=84.2%  min=77.6%)
-    2018:83%  2019:78%  2020:89%  2021:85%  2022:86%  2023:91%  2024:78%  2025:83%
+  Dirt / sprint(~1200) / Maiden-debut  (total: 132R)
+      2018                                                            12R  ROI=  56.7%  hit= 16.7%  profit=-520
+      2019                                                            12R  ROI=  50.0%  hit= 16.7%  profit=-600
+      2020                                                            16R  ROI=  83.8%  hit= 25.0%  profit=-260
+      2021                                                            10R  ROI= 156.0% ***  hit= 40.0%  profit=+560
+      2022                                                            26R  ROI=  89.2%  hit= 23.1%  profit=-282
+      2023                                                            26R  ROI= 141.5% ***  hit= 38.5%  profit=+1,080
+      2024                                                            10R  ROI=   0.0%  hit=  0.0%  profit=-1,000
+      2025                                                            20R  ROI= 179.0% ***  hit= 50.0%  profit=+1,580
 
-  Turf / sprint(~1200) / 2win  (avg=85.5%  min=74.6%)
-    2018:90%  2019:76%  2020:100%  2021:89%  2022:75%  2023:85%  2024:84%
+  Turf / middle(1601-2000) / 3win  (total: 181R)
+      2019                                                            12R  ROI= 221.7% ***  hit= 66.7%  profit=+1,460
+      2020                                                            18R  ROI=  71.1%  hit= 22.2%  profit=-520
+      2021                                                            34R  ROI= 101.8% **  hit= 29.4%  profit=+60
+      2022                                                            24R  ROI=  90.0%  hit= 25.0%  profit=-240
+      2023                                                            30R  ROI=  69.3%  hit= 20.0%  profit=-920
+      2024                                                            26R  ROI= 113.7% ***  hit= 30.8%  profit=+356
+      2025                                                            37R  ROI= 113.0% ***  hit= 32.4%  profit=+480
 
-  Turf / ultralong(2401~) / 1win  (avg=91.1%  min=73.8%)
-    2018:74%  2019:89%  2020:85%  2021:77%  2022:84%  2023:104%  2024:124%
+  Turf / long(2001-2400) / 2win  (total: 52R)
+      2019                                                             8R  ROI=  75.0%  hit= 25.0%  profit=-200
+      2020                                                             8R  ROI= 157.5% ***  hit= 50.0%  profit=+460
+      2021                                                            10R  ROI=   0.0%  hit=  0.0%  profit=-1,000
+      2022                                                            10R  ROI= 260.0% ***  hit= 80.0%  profit=+1,600
+      2023                                                             8R  ROI=   0.0%  hit=  0.0%  profit=-800
+      2024                                                             4R  ROI= 160.0% ***  hit= 50.0%  profit=+240
+      2025                                                             4R  ROI= 175.0% ***  hit= 50.0%  profit=+300
 
-  Dirt / middle(1601-2000) / 2win  (avg=88.2%  min=73.0%)
-    2018:90%  2019:81%  2020:76%  2021:109%  2022:73%  2023:94%  2024:94%
+  Turf / ultralong(2401~) / Open  (total: 96R)
+      2018                                                            16R  ROI=  48.8%  hit= 12.5%  profit=-820
+      2019                                                             6R  ROI=   0.0%  hit=  0.0%  profit=-600
+      2020                                                             9R  ROI= 200.9% ***  hit= 55.6%  profit=+908
+      2021                                                            10R  ROI=  60.0%  hit= 20.0%  profit=-400
+      2022                                                            14R  ROI=  47.1%  hit= 14.3%  profit=-740
+      2023                                                            12R  ROI=  50.0%  hit= 16.7%  profit=-600
+      2024                                                            12R  ROI=  58.3%  hit= 16.7%  profit=-500
+      2025                                                            17R  ROI= 180.0% ***  hit= 52.9%  profit=+1,360
 
-  Dirt / middle(1601-2000) / 3win  (avg=88.4%  min=72.4%)
-    2018:109%  2019:74%  2020:73%  2021:72%  2022:84%  2023:97%  2024:110%
+===========================================================================
+[F] Top conditions x VENUE (odds>=3.0, top1 100yen)
+===========================================================================
 
-  Turf / middle(1601-2000) / 1win  (avg=79.6%  min=72.0%)
-    2018:82%  2019:72%  2020:82%  2021:89%  2022:74%  2023:81%  2024:77%
+  Turf / mile(1201-1600) / Maiden-debut  (total: 358R)
+      中京                                                              50R  ROI= 110.8% ***  hit= 32.0%  profit=+538
+      中山                                                              34R  ROI=  85.3%  hit= 23.5%  profit=-500
+      京都                                                              44R  ROI=  79.5%  hit= 22.7%  profit=-900
+      新潟                                                              78R  ROI= 105.1% ***  hit= 28.2%  profit=+400
+      札幌                                                              12R  ROI= 221.7% ***  hit= 66.7%  profit=+1,460
+      東京                                                              82R  ROI= 132.2% ***  hit= 39.0%  profit=+2,640
+      阣神                                                              58R  ROI= 135.2% ***  hit= 37.9%  profit=+2,040
 
-  Dirt / middle(1601-2000) / 1win  (avg=80.9%  min=70.2%)
-    2018:73%  2019:78%  2020:96%  2021:83%  2022:80%  2023:70%  2024:87%
+  Turf / ultralong(2401~) / 1win  (total: 94R)
+      函館                                                              12R  ROI=   0.0%  hit=  0.0%  profit=-1,200
+      小倉                                                              30R  ROI= 138.7% ***  hit= 40.0%  profit=+1,160
+      札幌                                                              16R  ROI=  88.8%  hit= 25.0%  profit=-180
+      福島                                                              32R  ROI= 136.2% ***  hit= 37.5%  profit=+1,160
 
-  Turf / middle(1601-2000) / Maiden  (avg=79.3%  min=69.7%)
-    2018:87%  2019:76%  2020:79%  2021:81%  2022:70%  2023:86%  2024:82%  2025:74%
+  Turf / ultralong(2401~) / Maiden  (total: 52R)
+      函館                                                              10R  ROI= 138.0% ***  hit= 40.0%  profit=+380
+      小倉                                                               6R  ROI= 130.0% ***  hit= 33.3%  profit=+180
+      札幌                                                              18R  ROI=  74.4%  hit= 22.2%  profit=-460
+      福島                                                              18R  ROI= 162.2% ***  hit= 44.4%  profit=+1,120
 
-  Dirt / mile(1201-1600) / 1win  (avg=85.4%  min=69.3%)
-    2018:87%  2019:77%  2020:69%  2021:117%  2022:85%  2023:74%  2024:87%
+  Dirt / middle(1601-2000) / 3win  (total: 258R)
+      中京                                                              40R  ROI=  76.9%  hit= 20.0%  profit=-924
+      中山                                                              50R  ROI=  39.2%  hit= 12.0%  profit=-3,040
+      京都                                                              28R  ROI=  99.3% *  hit= 28.6%  profit=-20
+      小倉                                                              34R  ROI=  61.2%  hit= 17.6%  profit=-1,320
+      新潟                                                              20R  ROI= 144.0% ***  hit= 40.0%  profit=+880
+      札幌                                                              18R  ROI=  75.6%  hit= 22.2%  profit=-440
+      福島                                                              12R  ROI=  55.0%  hit= 16.7%  profit=-540
+      阣神                                                              56R  ROI= 106.4% ***  hit= 28.6%  profit=+358
 
-  Turf / mile(1201-1600) / 1win  (avg=79.3%  min=69.2%)
-    2018:80%  2019:69%  2020:90%  2021:89%  2022:82%  2023:71%  2024:75%
+  Dirt / long(2001-2400) / 3win  (total: 26R)
+      東京                                                              26R  ROI= 132.3% ***  hit= 38.5%  profit=+840
 
-  Turf / middle(1601-2000) / Maiden-debut  (avg=78.9%  min=66.7%)
-    2018:105%  2019:90%  2020:69%  2021:80%  2022:76%  2023:67%  2024:77%  2025:68%
+  Turf / sprint(~1200) / Maiden-debut  (total: 160R)
+      中山                                                              26R  ROI= 169.2% ***  hit= 46.2%  profit=+1,800
+      京都                                                               8R  ROI=  80.0%  hit= 25.0%  profit=-160
+      函館                                                              30R  ROI=  94.0%  hit= 26.7%  profit=-180
+      小倉                                                              44R  ROI=  74.5%  hit= 22.7%  profit=-1,120
+      新潟                                                               8R  ROI=   0.0%  hit=  0.0%  profit=-800
+      福島                                                              32R  ROI= 176.2% ***  hit= 50.0%  profit=+2,438
+      阣神                                                               8R  ROI= 105.0% ***  hit= 25.0%  profit=+40
 
-  Turf / mile(1201-1600) / Maiden  (avg=82.7%  min=65.7%)
-    2018:91%  2019:81%  2020:99%  2021:73%  2022:85%  2023:93%  2024:73%  2025:66%
+  Dirt / sprint(~1200) / Maiden-debut  (total: 132R)
+      中京                                                              12R  ROI=  51.7%  hit= 16.7%  profit=-580
+      中山                                                              58R  ROI=  70.7%  hit= 20.7%  profit=-1,700
+      京都                                                              10R  ROI= 130.0% ***  hit= 40.0%  profit=+300
+      新潟                                                              24R  ROI= 130.0% ***  hit= 33.3%  profit=+720
+      福島                                                               6R  ROI= 246.7% ***  hit= 66.7%  profit=+880
+      阣神                                                              16R  ROI=  97.4% *  hit= 25.0%  profit=-42
 
-  Dirt / middle(1601-2000) / Maiden  (avg=72.5%  min=65.0%)
-    2018:65%  2019:67%  2020:73%  2021:76%  2022:83%  2023:70%  2024:71%  2025:76%
+  Turf / middle(1601-2000) / 3win  (total: 181R)
+      中京                                                              13R  ROI= 112.3% ***  hit= 30.8%  profit=+160
+      中山                                                              24R  ROI=  86.7%  hit= 25.0%  profit=-320
+      京都                                                              12R  ROI= 141.5% ***  hit= 33.3%  profit=+498
+      函館                                                              14R  ROI=  97.1% *  hit= 28.6%  profit=-40
+      小倉                                                              16R  ROI= 161.2% ***  hit= 50.0%  profit=+980
+      新潟                                                              12R  ROI= 150.0% ***  hit= 50.0%  profit=+600
+      札幌                                                              16R  ROI=   0.0%  hit=  0.0%  profit=-1,600
+      東京                                                              32R  ROI= 109.4% ***  hit= 31.2%  profit=+300
+      福島                                                               8R  ROI=   0.0%  hit=  0.0%  profit=-800
+      阣神                                                              34R  ROI= 126.4% ***  hit= 35.3%  profit=+898
 
-  Dirt / sprint(~1200) / Maiden  (avg=80.9%  min=62.6%)
-    2018:73%  2019:80%  2020:73%  2021:88%  2022:63%  2023:91%  2024:87%  2025:92%
+  Turf / long(2001-2400) / 2win  (total: 52R)
+      中京                                                              10R  ROI=  60.0%  hit= 20.0%  profit=-400
+      京都                                                              10R  ROI= 130.0% ***  hit= 40.0%  profit=+300
+      東京                                                              12R  ROI= 100.0% **  hit= 33.3%  profit=+0
+      阣神                                                              12R  ROI= 166.7% ***  hit= 50.0%  profit=+800
 
-  Dirt / long(2001-2400) / 3win  (avg=140.6%  min=62.0%)
-    2018:172%  2019:62%  2020:188%  2021:152%  2022:148%  2023:122%
+  Turf / ultralong(2401~) / Open  (total: 96R)
+      中山                                                              22R  ROI=  66.4%  hit= 18.2%  profit=-740
+      京都                                                               9R  ROI= 187.8% ***  hit= 55.6%  profit=+790
+      札幌                                                              22R  ROI=  60.9%  hit= 18.2%  profit=-860
+      東京                                                              28R  ROI=  99.2% *  hit= 28.6%  profit=-22
+      阣神                                                              12R  ROI=   0.0%  hit=  0.0%  profit=-1,200
 
---- [D] top stable conditions x spread x odds filter ---
+===========================================================================
+[G] 4-way combo x odds>=3.0 (>=20R, sorted by ROI, top30)
+===========================================================================
+  中山 / Turf / sprint(~1200) / Open                                    35R  ROI= 191.9% ***  hit= 48.6%  profit=+3,218
+  阣神 / Dirt / sprint(~1200) / G1                                      26R  ROI= 185.4% ***  hit= 53.8%  profit=+2,220
+  福島 / Turf / sprint(~1200) / Maiden-debut                            32R  ROI= 176.2% ***  hit= 50.0%  profit=+2,438
+  中山 / Turf / sprint(~1200) / Maiden-debut                            26R  ROI= 169.2% ***  hit= 46.2%  profit=+1,800
+  中京 / Turf / long(2001-2400) / 1win                                  26R  ROI= 157.7% ***  hit= 46.2%  profit=+1,500
+  札幌 / Turf / mile(1201-1600) / 1win                                  24R  ROI= 157.5% ***  hit= 41.7%  profit=+1,380
+  札幌 / Turf / middle(1601-2000) / Open                                20R  ROI= 153.0% ***  hit= 40.0%  profit=+1,060
+  小倉 / Turf / middle(1601-2000) / Maiden-debut                        22R  ROI= 152.7% ***  hit= 45.5%  profit=+1,160
+  函館 / Dirt / sprint(~1200) / Maiden                                  42R  ROI= 145.7% ***  hit= 42.9%  profit=+1,920
+  阣神 / Dirt / middle(1601-2000) / 2win                                92R  ROI= 144.8% ***  hit= 41.3%  profit=+4,120
+  新潟 / Dirt / middle(1601-2000) / 3win                                20R  ROI= 144.0% ***  hit= 40.0%  profit=+880
+  中京 / Dirt / middle(1601-2000) / Open                                20R  ROI= 143.0% ***  hit= 40.0%  profit=+860
+  中京 / Turf / middle(1601-2000) / 1win                                34R  ROI= 141.7% ***  hit= 41.2%  profit=+1,418
+  阣神 / Turf / mile(1201-1600) / 2win                                  38R  ROI= 140.0% ***  hit= 42.1%  profit=+1,520
+  阣神 / Dirt / sprint(~1200) / 2win                                    52R  ROI= 139.2% ***  hit= 38.5%  profit=+2,036
+  小倉 / Turf / ultralong(2401~) / 1win                                 30R  ROI= 138.7% ***  hit= 40.0%  profit=+1,160
+  新潟 / Turf / mile(1201-1600) / Open                                  56R  ROI= 138.5% ***  hit= 35.7%  profit=+2,158
+  福島 / Turf / ultralong(2401~) / 1win                                 32R  ROI= 136.2% ***  hit= 37.5%  profit=+1,160
+  阣神 / Turf / mile(1201-1600) / Maiden-debut                          58R  ROI= 135.2% ***  hit= 37.9%  profit=+2,040
+  中京 / Dirt / sprint(~1200) / 2win                                    29R  ROI= 135.1% ***  hit= 41.4%  profit=+1,018
+  中京 / Dirt / middle(1601-2000) / Maiden-debut                        23R  ROI= 133.9% ***  hit= 34.8%  profit=+780
+  東京 / Dirt / long(2001-2400) / 3win                                  26R  ROI= 132.3% ***  hit= 38.5%  profit=+840
+  東京 / Turf / mile(1201-1600) / Maiden-debut                          82R  ROI= 132.2% ***  hit= 39.0%  profit=+2,640
+  東京 / Turf / mile(1201-1600) / Maiden                               102R  ROI= 132.1% ***  hit= 37.3%  profit=+3,278
+  小倉 / Dirt / middle(1601-2000) / 2win                                62R  ROI= 131.9% ***  hit= 38.7%  profit=+1,980
+  東京 / Turf / middle(1601-2000) / G1                                  32R  ROI= 131.2% ***  hit= 37.5%  profit=+998
+  新潟 / Dirt / sprint(~1200) / Maiden-debut                            24R  ROI= 130.0% ***  hit= 33.3%  profit=+720
+  函館 / Turf / middle(1601-2000) / 2win                                22R  ROI= 128.2% ***  hit= 36.4%  profit=+620
+  阣神 / Turf / middle(1601-2000) / 3win                                34R  ROI= 126.4% ***  hit= 35.3%  profit=+898
+  阣神 / Turf / middle(1601-2000) / 1win                                29R  ROI= 125.5% ***  hit= 37.9%  profit=+740
 
-  condition: Turf / mile(1201-1600) / Maiden-debut  (avg=84.2%)
-      spread>=3 odds>=1.0                                      1343R  ROI=  84.5%  hit= 35.4%  profit=-20,788
-      spread>=3 odds>=2.0                                      1009R  ROI=  87.2%  hit= 30.9%  profit=-12,898
-      spread>=3 odds>=3.0                                       358R  ROI= 115.9% ***  hit= 33.0%  profit=+5,678
-      spread>=5 odds>=1.0                                      1301R  ROI=  84.4%  hit= 35.6%  profit=-20,308
-      spread>=5 odds>=2.0                                       973R  ROI=  86.9%  hit= 31.0%  profit=-12,718
-      spread>=5 odds>=3.0                                       336R  ROI= 114.6% ***  hit= 32.7%  profit=+4,898
-      spread>=8 odds>=1.0                                      1101R  ROI=  82.4%  hit= 36.1%  profit=-19,416
-      spread>=8 odds>=2.0                                       799R  ROI=  83.4%  hit= 30.5%  profit=-13,296
-      spread>=8 odds>=3.0                                       270R  ROI= 102.7% **  hit= 30.4%  profit=+740
+===========================================================================
+[H] Year stability of top 4-way+odds>=3.0 conditions (sorted by min-year ROI)
+===========================================================================
 
-  condition: Turf / sprint(~1200) / 2win  (avg=85.5%)
-      spread>=3 odds>=1.0                                       632R  ROI=  84.8%  hit= 30.7%  profit=-9,586
-      spread>=3 odds>=2.0                                       570R  ROI=  81.4%  hit= 26.7%  profit=-10,606
-      spread>=3 odds>=3.0                                       348R  ROI=  79.4%  hit= 21.3%  profit=-7,152
-      spread>=5 odds>=1.0                                       533R  ROI=  85.4%  hit= 31.5%  profit=-7,782
-      spread>=5 odds>=2.0                                       475R  ROI=  81.3%  hit= 26.9%  profit=-8,902
-      spread>=5 odds>=3.0                                       268R  ROI=  82.9%  hit= 22.4%  profit=-4,570
-      spread>=8 odds>=1.0                                       313R  ROI=  96.8% *  hit= 36.4%  profit=-1,010
-      spread>=8 odds>=2.0                                       273R  ROI=  91.8%  hit= 30.8%  profit=-2,230
-      spread>=8 odds>=3.0                                       132R  ROI= 105.1% ***  hit= 28.8%  profit=+676
+  福島 / Turf / ultralong(2401~) / 1win  (32R  avg=148.3%  min=106.7%)
+    2019:215%  2020:107%  2022:117%  2023:170%  2024:133%
 
-  condition: Turf / ultralong(2401~) / 1win  (avg=91.1%)
-      spread>=3 odds>=1.0                                       250R  ROI=  92.8%  hit= 34.4%  profit=-1,802
-      spread>=3 odds>=2.0                                       216R  ROI=  93.1%  hit= 31.5%  profit=-1,482
-      spread>=3 odds>=3.0                                        92R  ROI= 122.8% ***  hit= 34.8%  profit=+2,100
-      spread>=5 odds>=1.0                                       218R  ROI=  92.0%  hit= 33.9%  profit=-1,742
-      spread>=5 odds>=2.0                                       190R  ROI=  94.8%  hit= 32.6%  profit=-982
-      spread>=5 odds>=3.0                                        70R  ROI= 139.7% ***  hit= 40.0%  profit=+2,780
-      spread>=8 odds>=1.0                                       142R  ROI=  99.4% *  hit= 36.6%  profit=-82
-      spread>=8 odds>=2.0                                       126R  ROI= 103.8% **  hit= 36.5%  profit=+478
-      spread>=8 odds>=3.0                                        44R  ROI= 159.5% ***  hit= 45.5%  profit=+2,620
+  阣神 / Dirt / middle(1601-2000) / 2win  (92R  avg=150.3%  min=104.4%)
+    2019:130%  2020:104%  2021:139%  2022:139%  2023:195%  2024:217%  2025:128%
 
-  condition: Dirt / middle(1601-2000) / 2win  (avg=88.2%)
-      spread>=3 odds>=1.0                                      1316R  ROI=  87.7%  hit= 37.4%  profit=-16,138
-      spread>=3 odds>=2.0                                      1004R  ROI=  83.0%  hit= 29.1%  profit=-17,098
-      spread>=3 odds>=3.0                                       488R  ROI=  85.9%  hit= 25.0%  profit=-6,880
-      spread>=5 odds>=1.0                                      1170R  ROI=  87.2%  hit= 37.9%  profit=-14,996
-      spread>=5 odds>=2.0                                       886R  ROI=  82.0%  hit= 29.3%  profit=-15,976
-      spread>=5 odds>=3.0                                       422R  ROI=  80.1%  hit= 23.7%  profit=-8,380
-      spread>=8 odds>=1.0                                       854R  ROI=  84.8%  hit= 38.9%  profit=-12,972
-      spread>=8 odds>=2.0                                       610R  ROI=  78.0%  hit= 28.9%  profit=-13,432
-      spread>=8 odds>=3.0                                       250R  ROI=  69.4%  hit= 20.8%  profit=-7,660
+  東京 / Turf / mile(1201-1600) / Maiden-debut  (82R  avg=133.4%  min=77.5%)
+    2018:138%  2019:85%  2020:78%  2021:131%  2022:152%  2023:124%  2024:252%  2025:107%
 
-  condition: Dirt / middle(1601-2000) / 3win  (avg=88.4%)
-      spread>=3 odds>=1.0                                       524R  ROI=  88.1%  hit= 33.6%  profit=-6,252
-      spread>=3 odds>=2.0                                       442R  ROI=  89.3%  hit= 30.3%  profit=-4,712
-      spread>=3 odds>=3.0                                       252R  ROI=  82.4%  hit= 23.0%  profit=-4,446
-      spread>=5 odds>=1.0                                       454R  ROI=  89.7%  hit= 34.8%  profit=-4,670
-      spread>=5 odds>=2.0                                       378R  ROI=  91.9%  hit= 31.7%  profit=-3,070
-      spread>=5 odds>=3.0                                       206R  ROI=  83.0%  hit= 23.3%  profit=-3,504
-      spread>=8 odds>=1.0                                       306R  ROI= 103.2% **  hit= 41.2%  profit=+972
-      spread>=8 odds>=2.0                                       250R  ROI= 107.5% ***  hit= 38.4%  profit=+1,872
-      spread>=8 odds>=3.0                                       118R  ROI= 100.8% **  hit= 28.8%  profit=+98
+  阣神 / Turf / middle(1601-2000) / 1win  (29R  avg=166.0%  min=75.0%)
+    2019:157%  2021:107%  2022:325%  2023:75%
+
+  阣神 / Dirt / sprint(~1200) / 2win  (52R  avg=157.2%  min=60.0%)
+    2019:155%  2020:60%  2021:128%  2022:285%  2025:158%
+
+  小倉 / Dirt / middle(1601-2000) / 2win  (62R  avg=171.3%  min=52.9%)
+    2019:310%  2020:370%  2021:53%  2022:103%  2023:75%  2024:164%  2025:124%
+
+  福島 / Turf / sprint(~1200) / Maiden-debut  (32R  avg=189.1%  min=0.0%)
+    2018:0%  2020:182%  2022:360%  2023:243%  2024:160%
+
+  中山 / Turf / sprint(~1200) / Open  (35R  avg=182.3%  min=0.0%)
+    2018:204%  2019:155%  2020:107%  2021:380%  2023:235%  2024:195%  2025:0%
+
+  中京 / Turf / long(2001-2400) / 1win  (26R  avg=179.7%  min=0.0%)
+    2019:325%  2021:253%  2022:150%  2023:0%  2024:170%
+
+  新潟 / Turf / mile(1201-1600) / Open  (56R  avg=149.6%  min=0.0%)
+    2018:310%  2019:127%  2020:74%  2021:190%  2022:110%  2023:240%  2024:0%  2025:147%
+
+  中山 / Turf / sprint(~1200) / Maiden-debut  (26R  avg=145.0%  min=0.0%)
+    2019:220%  2020:0%  2021:0%  2022:175%  2024:330%
+
+  阣神 / Turf / mile(1201-1600) / 2win  (38R  avg=141.7%  min=0.0%)
+    2019:0%  2020:88%  2021:136%  2022:310%  2025:175%
+
+  函館 / Dirt / sprint(~1200) / Maiden  (42R  avg=138.5%  min=0.0%)
+    2019:190%  2020:0%  2021:220%  2022:0%  2023:66%  2024:323%  2025:170%
+
+  札幌 / Turf / middle(1601-2000) / Open  (20R  avg=135.0%  min=0.0%)
+    2018:160%  2020:0%  2022:210%  2025:170%
+
+  中京 / Dirt / sprint(~1200) / 2win  (29R  avg=134.8%  min=0.0%)
+    2020:0%  2021:272%  2022:112%  2023:155%
+
+  中京 / Turf / middle(1601-2000) / 1win  (34R  avg=129.9%  min=0.0%)
+    2019:136%  2020:0%  2021:203%  2023:160%  2025:150%
+
+  東京 / Turf / mile(1201-1600) / Maiden  (102R  avg=124.9%  min=0.0%)
+    2018:131%  2019:209%  2020:62%  2021:100%  2022:196%  2023:223%  2024:0%  2025:78%
+
+  阣神 / Turf / mile(1201-1600) / Maiden-debut  (58R  avg=114.1%  min=0.0%)
+    2018:0%  2019:103%  2020:172%  2021:190%  2022:186%  2023:100%  2024:0%  2025:162%
+
+  阣神 / Turf / middle(1601-2000) / 3win  (34R  avg=102.0%  min=0.0%)
+    2020:150%  2021:130%  2022:230%  2023:0%  2025:0%
+
+  新潟 / Dirt / sprint(~1200) / Maiden-debut  (24R  avg=96.0%  min=0.0%)
+    2020:0%  2021:260%  2022:0%  2024:0%  2025:220%
 
 * = >=95%  ** = >=100%  *** = >=105%
