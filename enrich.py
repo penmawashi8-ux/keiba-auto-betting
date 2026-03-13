@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import requests, re, csv, sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -29,9 +30,9 @@ def fetch_race_meta(race_id):
             elif '1勝' in name: race_class = '1勝'
             elif '2勝' in name: race_class = '2勝'
             elif '3勝' in name: race_class = '3勝'
-            elif 'GI' in name or 'GⅠ' in name: race_class = 'G1'
-            elif 'GII' in name or 'GⅡ' in name: race_class = 'G2'
-            elif 'GIII' in name or 'GⅢ' in name: race_class = 'G3'
+            elif 'GⅠ' in name or 'GI' in name: race_class = 'G1'
+            elif 'GⅡ' in name or 'GII' in name: race_class = 'G2'
+            elif 'GⅢ' in name or 'GIII' in name: race_class = 'G3'
         if distance <= 1200: dist_band = '短距離(~1200)'
         elif distance <= 1600: dist_band = '短中距離(1201-1600)'
         elif distance <= 2000: dist_band = '中距離(1601-2000)'
@@ -48,7 +49,7 @@ def run(input_csv='backtest_result.csv', output_csv='enriched.csv'):
         rows = list(csv.DictReader(f))
     print(f'元データ: {len(rows)}行')
     race_ids = list(dict.fromkeys(r['race_id'] for r in rows))
-    print(f'ユニークrace_id: {len(race_ids)}件')
+    print(f'ユニーrace_id: {len(race_ids)}件')
     meta = {}
     with ThreadPoolExecutor(max_workers=15) as ex:
         futures = {ex.submit(fetch_race_meta, rid): rid for rid in race_ids}
@@ -58,7 +59,7 @@ def run(input_csv='backtest_result.csv', output_csv='enriched.csv'):
             meta[result['race_id']] = result
             done += 1
             if done % 200 == 0:
-                print(f'  {done}/{len(race_ids)} 完ĺ�...')
+                print(f'  {done}/{len(race_ids)} 完了...')
     fieldnames = list(rows[0].keys()) + ['venue','surface','distance','dist_band','race_class']
     with open(output_csv, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
