@@ -1,55 +1,79 @@
-# -*- coding: utf-8 -*-
-import requests, re, csv, sys
+import requests, re, csv, sys, time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 SESSION = requests.Session()
-SESSION.headers.update({'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15', 'Referer': 'https://race.netkeiba.com/'})
+SESSION.headers.update({
+    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15',
+    'Referer': 'https://race.netkeiba.com/',
+})
 
-VENUE_MAP = {'01':'札幌','02':'函館','03':'福島','04':'新潟','05':'東京','06':'中山','07':'中京','08':'京都','09':'阪神','10':'小倉'}
+VENUE_MAP = {
+    '01': '\u672d\u5e4c', '02': '\u51fd\u9928', '03': '\u798f\u5cf6', '04': '\u65b0\u6f5f', '05': '\u6771\u4eac',
+    '06': '\u4e2d\u5c71', '07': '\u4e2d\u4eac', '08': '\u4eac\u90fd', '09': '\u9623\u795e', '10': '\u5c0f\u5009',
+}
 
 def fetch_race_meta(race_id):
     url = f'https://race.netkeiba.com/race/shutuba.html?race_id={race_id}'
     try:
         r = SESSION.get(url, timeout=15)
         html = r.content.decode('euc-jp', errors='replace')
-        venue = VENUE_MAP.get(race_id[4:6], race_id[4:6])
-        surface = ''
-        m = re.search(r'class="(Dirt|Turf)">', html)
+
+        venue_code = race_id[4:6]
+        venue = VENUE_MAP.get(venue_code, venue_code)
+
+        surface, distance = '', 0
+        m = re.search(r'(\u82dd|\u30c0[\u30fc\u30fc]?\u30c8?)[\s\u3000]*(\d{3,4})\s*m', html)
         if m:
-            surface = 'ダート' if m.group(1) == 'Dirt' else '芝'
-        distance = 0
-        m2 = re.search(r'<span>(\d{3,4})m</span>', html)
-        if m2:
-            distance = int(m2.group(1))
-        race_class = 'OP'
-        m3 = re.search(r'class="Race_Name"[^>]*>(.*?)</', html, re.DOTALL)
-        if m3:
-            name = m3.group(1).strip()
-            if '新馬' in name: race_class = '新馬'
-            elif '未勝利' in name: race_class = '未勝利'
-            elif '1勝' in name: race_class = '1勝'
-            elif '2勝' in name: race_class = '2勝'
-            elif '3勝' in name: race_class = '3勝'
-            elif 'GⅠ' in name or 'GI' in name: race_class = 'G1'
-            elif 'GⅡ' in name or 'GII' in name: race_class = 'G2'
-            elif 'GⅢ' in name or 'GIII' in name: race_class = 'G3'
-        if distance <= 1200: dist_band = '短距離(~1200)'
-        elif distance <= 1600: dist_band = '短中距離(1201-1600)'
-        elif distance <= 2000: dist_band = '中距離(1601-2000)'
-        elif distance <= 2400: dist_band = '中長距離(2001-2400)'
-        else: dist_band = '長距離(2401~)'
-        return {'race_id':race_id,'venue':venue,'surface':surface,'distance':distance,'dist_band':dist_band,'race_class':race_class}
+            surface = '\u82dd' if m.group(1) == '\u82dd' else '\u30c0\u30fc\u30c8'
+            distance = int(m.group(2))
+
+        race_class = ''
+        for kw, label in [
+            ('\u65b0\u99ac', '\u65b0\u99ac'),
+            ('\u672a\u52dd\u5229', '\u672a\u52dd\u5229'),
+            ('1\u52dd\u30af\u30e9\u30b9', '1\u52dd'),
+            ('2\u52dd\u30af\u30e9\u30b9', '2\u52dd'),
+            ('3\u52dd\u30af\u30e9\u30b9', '3\u52dd'),
+            ('\u30aa\u30fc\u30d7\u30f3', 'OP'),
+            ('G\u2160', 'G1'), ('G\u2161', 'G2'), ('G\u2162', 'G3'),
+            ('G1', 'G1'), ('G2', 'G2'), ('G3', 'G3'),
+        ]:
+            if kw in html:
+                race_class = label
+                break
+
+        if distance <= 1200:
+            dist_band = 'sprint(~1200)'
+        elif distance <= 1600:
+            dist_band = 'mile(1201-1600)'
+        elif distance <= 2000:
+            dist_band = 'middle(1601-2000)'
+        elif distance <= 2400:
+            dist_band = 'long(2001-2400)'
+        else:
+            dist_band = 'ultralong(2401~)'
+
+        return {
+            'race_id':    race_id,
+            'venue':      venue,
+            'surface':    surface,
+            'distance':   distance,
+            'dist_band':  dist_band,
+            'race_class': race_class,
+        }
     except Exception as e:
         print(f'  [WARN] {race_id}: {e}')
-        return {'race_id':race_id,'venue':'','surface':'','distance':0,'dist_band':'','race_class':''}
+        return {'race_id': race_id, 'venue': '', 'surface': '', 'distance': 0, 'dist_band': '', 'race_class': ''}
 
-def run(input_csv='backtest_result.csv', output_csv='enriched.csv'):
+def run(input_csv, output_csv):
     rows = []
     with open(input_csv, encoding='utf-8-sig') as f:
         rows = list(csv.DictReader(f))
-    print(f'元データ: {len(rows)}行')
+    print(f'input: {len(rows)} rows')
+
     race_ids = list(dict.fromkeys(r['race_id'] for r in rows))
-    print(f'ユニーrace_id: {len(race_ids)}件')
+    print(f'unique race_ids: {len(race_ids)} -> fetching meta...')
+
     meta = {}
     with ThreadPoolExecutor(max_workers=15) as ex:
         futures = {ex.submit(fetch_race_meta, rid): rid for rid in race_ids}
@@ -58,19 +82,29 @@ def run(input_csv='backtest_result.csv', output_csv='enriched.csv'):
             result = future.result()
             meta[result['race_id']] = result
             done += 1
-            if done % 200 == 0:
-                print(f'  {done}/{len(race_ids)} 完了...')
-    fieldnames = list(rows[0].keys()) + ['venue','surface','distance','dist_band','race_class']
+            if done % 100 == 0:
+                print(f'  {done}/{len(race_ids)} done...')
+
+    print('meta fetch complete')
+
+    fieldnames = list(rows[0].keys()) + ['venue', 'surface', 'distance', 'dist_band', 'race_class']
     with open(output_csv, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for row in rows:
             m = meta.get(row['race_id'], {})
-            row.update({'venue':m.get('venue',''),'surface':m.get('surface',''),'distance':m.get('distance',0),'dist_band':m.get('dist_band',''),'race_class':m.get('race_class','')})
+            row.update({
+                'venue':      m.get('venue', ''),
+                'surface':    m.get('surface', ''),
+                'distance':   m.get('distance', 0),
+                'dist_band':  m.get('dist_band', ''),
+                'race_class': m.get('race_class', ''),
+            })
             writer.writerow(row)
-    print(f'{output_csv} 保存完了 ({len(rows)}行)')
+
+    print(f'saved: {output_csv} ({len(rows)} rows)')
 
 if __name__ == '__main__':
     inp = sys.argv[1] if len(sys.argv) > 1 else 'backtest_result.csv'
-    out = sys.argv[2] if len(sys.argv) > 2 else 'enriched.csv'
+    out = sys.argv[2] if len(sys.argv) > 2 else inp.replace('.csv', '_enriched.csv')
     run(inp, out)
