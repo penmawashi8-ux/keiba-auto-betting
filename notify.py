@@ -1,8 +1,10 @@
-import requests, re, os, sys
+import requests, re, os, json
 from datetime import datetime, timezone, timedelta
 
 JST = timezone(timedelta(hours=9))
 DISCORD_WEBHOOK = os.environ.get('DISCORD_WEBHOOK', '')
+GH_TOKEN = os.environ.get('GH_TOKEN', '')
+GH_REPO = 'penmawashi8-ux/keiba-auto-betting'
 
 NOTIFY_MIN = 15
 NOTIFY_MAX = 30
@@ -26,13 +28,11 @@ VENUE_MAP = {
     '01':'札幌','02':'函館','03':'福島','04':'新潟','05':'東京',
     '06':'中山','07':'中京','08':'京都','09':'阪神','10':'小倉',
 }
-
 CLASS_KEYWORDS = [
     ('新馬','新馬'),('未勝利','未勝利'),
     ('1勝','1勝クラス'),('2勝','2勝クラス'),('3勝','3勝クラス'),
     ('Open','オープン'),('G3','G3'),('G2','G2'),('G1','G1'),
 ]
-
 HEADERS = {'User-Agent':'Mozilla/5.0 (compatible)','Accept-Charset':'euc-jp'}
 
 def get_today_race_ids():
@@ -47,119 +47,138 @@ def get_race_info(race_id):
     url = f'https://race.netkeiba.com/race/shutuba.html?race_id={race_id}'
     r = requests.get(url, headers=HEADERS, timeout=15)
     html = r.content.decode('euc-jp', errors='replace')
-
     venue_code = race_id[4:6]
     venue = VENUE_MAP.get(venue_code, '?')
-
     surface = ''
-    if re.search(r'<span class="Turf">', html):
-        surface = '芝'
-    elif re.search(r'<span class="Dirt">', html):
-        surface = 'ダート'
-
+    if re.search(r'<span class="Turf">', html): surface = '芝'
+    elif re.search(r'<span class="Dirt">', html): surface = 'ダート'
     dist = 0
     dm = re.search(r'<span>(\d{3,4})m</span>', html)
-    if dm:
-        dist = int(dm.group(1))
-
+    if dm: dist = int(dm.group(1))
     race_class = ''
     for cls_key, keyword in CLASS_KEYWORDS:
         if keyword in html:
             race_class = cls_key
             break
-
     start_time = None
     tm = re.search(r'(\d{1,2}):(\d{2})発走', html)
     if tm:
         now = datetime.now(JST)
         h, m = int(tm.group(1)), int(tm.group(2))
         start_time = now.replace(hour=h, minute=m, second=0, microsecond=0)
-
     return dict(race_id=race_id, venue=venue, surface=surface,
                 dist=dist, race_class=race_class, start_time=start_time)
 
-def get_top1_odds(race_id):
+def get_top1_odds_and_horse(race_id):
     url = f'https://race.netkeiba.com/api/api_get_jra_odds.html?type=1&race_id={race_id}'
     try:
         r = requests.get(url, headers=HEADERS, timeout=10)
         data = r.json()
-        odds_vals = []
-        for v in data.get('data', {}).get('odds', {}).values():
+        odds_map = {}
+        for horse_num, v in data.get('data', {}).get('odds', {}).items():
             if isinstance(v, list) and v:
-                try:
-                    odds_vals.append(float(v[0]))
-                except Exception:
-                    pass
-        if odds_vals:
-            return min(odds_vals)
+                try: odds_map[horse_num] = float(v[0])
+                except: pass
+        if odds_map:
+            top1_num = min(odds_map, key=odds_map.get)
+            return odds_map[top1_num], int(top1_num)
     except Exception as e:
         print(f'    odds error: {e}')
-    return None
+    return None, None
 
 def check_conditions(info, odds):
     matched = []
     for cond in CONDITIONS:
-        if cond['venue'] and info['venue'] != cond['venue']:
-            continue
-        if info['surface'] != cond['surface']:
-            continue
-        if not (cond['dist_min'] <= info['dist'] <= cond['dist_max']):
-            continue
-        if info['race_class'] != cond['race_class']:
-            continue
-        if odds is None or odds < cond['min_odds']:
-            continue
+        if cond['venue'] and info['venue'] != cond['venue']: continue
+        if info['surface'] != cond['surface']: continue
+        if not (cond['dist_min'] <= info['dist'] <= cond['dist_max']): continue
+        if info['race_class'] != cond['race_class']: continue
+        if odds is None or odds < cond['min_odds']: continue
         matched.append(cond['label'])
     return matched
 
+def push_bet_target(payload):
+    api = f'https://api.github.com/repos/{GH_REPO}/contents/bet_target.json'
+    headers = {
+        'Authorization': f'token {GH_TOKEN}',
+        'Accept': 'application/vnd.github.v3+json'
+    }
+    sha = None
+    try:
+        r = requests.get(api, headers=headers, timeout=10)
+        sha = r.json().get('sha')
+    except: pass
+    content = base64.b64encode(json.dumps(payload, ensure_ascii=False, indent=2).encode()).decode()
+    body = {'message': f'bet_target: {payload["race_id"]}', 'content': content}
+    if sha: body['sha'] = sha
+    r = requests.put(api, headers=headers, json=body, timeout=10)
+    print(f'[GitHub] push bet_target.json: {r.status_code}')
+
 def send_discord(message):
     if not DISCORD_WEBHOOK:
-        print('[Discord] WEBHOOK not set, skipping')
+        print('[Discord] WEBHOOK not set')
         return
     resp = requests.post(DISCORD_WEBHOOK, json={'content': message}, timeout=10)
     print(f'[Discord] status={resp.status_code}')
 
+import base64
+
 def main():
     now = datetime.now(JST)
     print(f'=== notify.py [{now.strftime("%Y-%m-%d %H:%M")} JST] ===')
-
     race_ids = get_today_race_ids()
     print(f'today races: {len(race_ids)}')
 
     for race_id in race_ids:
         try:
             info = get_race_info(race_id)
-            if not info['start_time']:
-                continue
+            if not info['start_time']: continue
 
             minutes_until = (info['start_time'] - now).total_seconds() / 60
-
-            if not (NOTIFY_MIN <= minutes_until <= NOTIFY_MAX):
-                continue
+            if not (NOTIFY_MIN <= minutes_until <= NOTIFY_MAX): continue
 
             label = f"{info['venue']} {info['surface']}{info['dist']}m {info['race_class']}"
             print(f'  [{race_id}] {label} 発走{info["start_time"].strftime("%H:%M")} ({minutes_until:.0f}分前)')
 
-            odds = get_top1_odds(race_id)
-            print(f'    1番人気: {odds}倍')
+            odds, horse_num = get_top1_odds_and_horse(race_id)
+            print(f'    1番人気: {horse_num}番 {odds}倍')
 
             matched = check_conditions(info, odds)
-            if matched:
-                msg  = '🎯 **条件合致レース！**\n'
-                msg += '━━━━━━━━━━━━\n'
-                msg += f'📍 {label}\n'
-                msg += f'⏱ 発走: {info["start_time"].strftime("%H:%M")} ({minutes_until:.0f}分前)\n'
-                msg += f'💴 1番人気オッズ: {odds}倍\n'
-                msg += '━━━━━━━━━━━━\n'
-                for m in matched:
-                    msg += f'✅ {m}\n'
-                msg += '━━━━━━━━━━━━\n'
-                msg += '🎟 買い方: 1番人気単勝\n'
-                msg += f'https://race.netkeiba.com/race/shutuba.html?race_id={race_id}'
-                print(msg)
-                send_discord(msg)
-            else:
-                print(f'    -> 条件不一致 (odds={odds})')
+            if not matched:
+                print(f'    -> 条件不一致')
+                continue
+
+            # bet_target.json をGitHubにpush
+            payload = {
+                'race_id': race_id,
+                'venue': info['venue'],
+                'surface': info['surface'],
+                'dist': info['dist'],
+                'race_class': info['race_class'],
+                'start_time': info['start_time'].strftime('%H:%M'),
+                'top1_odds': odds,
+                'top1_horse_num': horse_num,
+                'conditions': matched,
+                'amount': 100,
+                'updated_at': now.strftime('%Y-%m-%d %H:%M'),
+            }
+            push_bet_target(payload)
+
+            # Discord通知（Scriptableリンク付き）
+            msg  = '🎯 **条件合致レース！**\n'
+            msg += '━━━━━━━━━━━━\n'
+            msg += f'📍 {label}\n'
+            msg += f'⏱ 発走: {info["start_time"].strftime("%H:%M")} ({minutes_until:.0f}分前)\n'
+            msg += f'💴 1番人気: {horse_num}番 {odds}倍\n'
+            msg += '━━━━━━━━━━━━\n'
+            for m in matched:
+                msg += f'✅ {m}\n'
+            msg += '━━━━━━━━━━━━\n'
+            msg += '🎟 買い方: 1番人気単勝 100円\n'
+            msg += '📲 **自動購入はこちら↓**\n'
+            msg += 'scriptable:///run?scriptName=umaca_auto'
+            print(msg)
+            send_discord(msg)
 
         except Exception as e:
             print(f'  error [{race_id}]: {e}')
