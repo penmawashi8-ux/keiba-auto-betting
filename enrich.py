@@ -21,12 +21,19 @@ def fetch_race_meta(race_id):
         venue_code = race_id[4:6]
         venue = VENUE_MAP.get(venue_code, venue_code)
 
-        surface, distance = '', 0
-        m = re.search(r'(\u82dd|\u30c0[\u30fc\u30fc]?\u30c8?)[\s\u3000]*(\d{3,4})\s*m', html)
-        if m:
-            surface = '\u82dd' if m.group(1) == '\u82dd' else '\u30c0\u30fc\u30c8'
-            distance = int(m.group(2))
+        # surface: <span class="Dirt"> or <span class="Turf">
+        surface = ''
+        sm = re.search(r'<span class="(Dirt|Turf)">', html)
+        if sm:
+            surface = '\u82dd' if sm.group(1) == 'Turf' else '\u30c0\u30fc\u30c8'
 
+        # distance: <span>1200m</span>
+        distance = 0
+        dm = re.search(r'<span>(\d{3,4})m</span>', html)
+        if dm:
+            distance = int(dm.group(1))
+
+        # class: <h1 class="Race_Name">...</h1>
         race_class = ''
         for kw, label in [
             ('\u65b0\u99ac', '\u65b0\u99ac'),
@@ -88,18 +95,20 @@ def run(input_csv, output_csv):
     print('meta fetch complete')
 
     fieldnames = list(rows[0].keys()) + ['venue', 'surface', 'distance', 'dist_band', 'race_class']
+    # remove old meta columns if already present
+    existing = list(rows[0].keys())
+    if 'surface' in existing:
+        fieldnames = existing
     with open(output_csv, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for row in rows:
             m = meta.get(row['race_id'], {})
-            row.update({
-                'venue':      m.get('venue', ''),
-                'surface':    m.get('surface', ''),
-                'distance':   m.get('distance', 0),
-                'dist_band':  m.get('dist_band', ''),
-                'race_class': m.get('race_class', ''),
-            })
+            row['venue']      = m.get('venue', '')
+            row['surface']    = m.get('surface', '')
+            row['distance']   = m.get('distance', 0)
+            row['dist_band']  = m.get('dist_band', '')
+            row['race_class'] = m.get('race_class', '')
             writer.writerow(row)
 
     print(f'saved: {output_csv} ({len(rows)} rows)')
