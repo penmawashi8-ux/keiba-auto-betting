@@ -39,14 +39,20 @@ def run(path):
     valid = [r for r in rows if r['surface']]
     print(f'total: {len(rows)} rows (with meta: {len(valid)})\n')
 
+    SURF = {'\u82dd': 'Turf', '\u30c0\u30fc\u30c8': 'Dirt'}
+    CLS  = {
+        '\u65b0\u99ac': 'Maiden-debut', '\u672a\u52dd\u5229': 'Maiden',
+        '1\u52dd': '1win', '2\u52dd': '2win', '3\u52dd': '3win',
+        'OP': 'Open', 'G3': 'G3', 'G2': 'G2', 'G1': 'G1'
+    }
+
     # 1. surface
     print('='*70)
     print('[1] Turf vs Dirt (top1 100yen win)')
     print('='*70)
-    surf_label = {'\u82dd': 'Turf', '\u30c0\u30fc\u30c8': 'Dirt'}
-    for surf in ['\u82dd', '\u30c0\u30fc\u30c8']:
+    for surf, slabel in SURF.items():
         sub = [r for r in valid if r['surface'] == surf]
-        show(surf_label.get(surf, surf), sub, min_races=1)
+        show(slabel, sub, min_races=1)
 
     # 2. distance band
     print()
@@ -55,24 +61,18 @@ def run(path):
     print('='*70)
     bands = ['sprint(~1200)', 'mile(1201-1600)', 'middle(1601-2000)', 'long(2001-2400)', 'ultralong(2401~)']
     for band in bands:
-        for surf, slabel in [('\u82dd', 'Turf'), ('\u30c0\u30fc\u30c8', 'Dirt'), ('', 'All')]:
+        for surf, slabel in list(SURF.items()) + [('', 'All')]:
             sub = [r for r in valid if r['dist_band'] == band and (surf == '' or r['surface'] == surf)]
-            label = f'{band} {slabel}'
-            show(label, sub)
+            show(f'{band} {slabel}', sub)
 
     # 3. class
     print()
     print('='*70)
     print('[3] Race class (top1 100yen win)')
     print('='*70)
-    cls_label = {
-        '\u65b0\u99ac': 'Maiden-debut', '\u672a\u52dd\u5229': 'Maiden',
-        '1\u52dd': '1win', '2\u52dd': '2win', '3\u52dd': '3win',
-        'OP': 'Open', 'G3': 'G3', 'G2': 'G2', 'G1': 'G1'
-    }
-    for cls in ['\u65b0\u99ac', '\u672a\u52dd\u5229', '1\u52dd', '2\u52dd', '3\u52dd', 'OP', 'G3', 'G2', 'G1']:
+    for cls, clabel in CLS.items():
         sub = [r for r in valid if r['race_class'] == cls]
-        show(cls_label.get(cls, cls), sub, min_races=10)
+        show(clabel, sub, min_races=10)
 
     # 4. venue
     print()
@@ -82,7 +82,7 @@ def run(path):
     venues = sorted(set(r['venue'] for r in valid if r['venue']))
     for v in venues:
         sub = [r for r in valid if r['venue'] == v]
-        show.v, sub, min_races=1)
+        show(v, sub, min_races=1)
 
     # 5. combo: surface x dist_band x class
     print()
@@ -91,9 +91,7 @@ def run(path):
     print('='*70)
     combos = defaultdict(list)
     for r in valid:
-        surf_en = surf_label.get(r['surface'], r['surface'])
-        cls_en = cls_label.get(r['race_class'], r['race_class'] or 'unknown')
-        key = f"{surf_en} / {r['dist_band']} / {cls_en}"
+        key = f"{SURF.get(r['surface'], r['surface'])} / {r['dist_band']} / {CLS.get(r['race_class'], r['race_class'] or 'unknown')}"
         combos[key].append(r)
 
     results = []
@@ -113,8 +111,7 @@ def run(path):
     print('='*70)
     print('[6] Top conditions x spread threshold (>=20 races)')
     print('='*70)
-    top_combos = sorted(results, reverse=True)[:5]
-    for _, key, sub in top_combos:
+    for _, key, sub in sorted(results, reverse=True)[:5]:
         print(f'\n  condition: {key}')
         for th in [3.0, 5.0, 8.0, 10.0]:
             filtered = [r for r in sub if r['spread'] >= th]
