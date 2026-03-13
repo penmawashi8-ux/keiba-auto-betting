@@ -20,7 +20,12 @@ jobs:
         run: pip install requests --quiet
 
       - name: Run enrich
-        run: python3 enrich.py backtest_${{ github.event.inputs.year }}.csv backtest_${{ github.event.inputs.year }}_enriched.csv
+        run: |
+          INPUT="backtest_${{ github.event.inputs.year }}.csv"
+          if [ ! -f "$INPUT" ] && [ "${{ github.event.inputs.year }}" = "2025" ]; then
+            INPUT="backtest_result.csv"
+          fi
+          python3 enrich.py "$INPUT" backtest_${{ github.event.inputs.year }}_enriched.csv
 
       - name: Commit result
         run: |
