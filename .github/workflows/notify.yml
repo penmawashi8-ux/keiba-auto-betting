@@ -1,0 +1,21 @@
+name: notify
+
+on:
+  schedule:
+    # 土日 JST 9:00-17:00 = UTC 0:00-8:00, 10分おき
+    - cron: '*/10 0-8 * * 0,6'
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Run notify
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: python notify.py
