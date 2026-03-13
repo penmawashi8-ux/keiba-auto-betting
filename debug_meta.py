@@ -8,6 +8,10 @@ url = f'https://race.netkeiba.com/race/shutuba.html?race_id={race_id}'
 r = SESSION.get(url, timeout=15)
 html = r.content.decode('euc-jp', errors='replace')
 
-m = re.search(r'class="Race_Data"[^>]*>(.*?)</div>', html, re.DOTALL)
+m = re.search(r'class="Race_Name"[^>]*>(.*?)</', html, re.DOTALL)
 if m:
-    print("Race_Data:", repr(m.group(1)[:500]))
+    print("Race_Name:", repr(m.group(1)[:200]))
+
+m2 = re.search(r'class="Race_Data"[^>]*>(.*?)</div>', html, re.DOTALL)
+if m2:
+    print("Race_Data:", repr(m2.group(1)[:300]))
