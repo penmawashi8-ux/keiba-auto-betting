@@ -151,6 +151,7 @@ def main():
             # bet_target.json をGitHubにpush
             payload = {
                 'race_id': race_id,
+                'race_num': int(race_id[10:12]),
                 'venue': info['venue'],
                 'surface': info['surface'],
                 'dist': info['dist'],
