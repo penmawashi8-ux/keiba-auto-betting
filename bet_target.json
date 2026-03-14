@@ -1,0 +1,14 @@
+{
+  "race_id": "202509070107",
+  "race_num": 7,
+  "venue": "阪神",
+  "surface": "ダート",
+  "dist": 1800,
+  "race_class": "2勝",
+  "start_time": "13:09",
+  "top1_odds": 3.9,
+  "top1_horse_num": 10,
+  "conditions": ["★★★ 阪神/ダート/1601-2000m/2勝/odds>=3.0"],
+  "amount": 100,
+  "updated_at": "2026-03-14 11:30"
+}
