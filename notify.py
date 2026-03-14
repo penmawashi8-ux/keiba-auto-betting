@@ -70,25 +70,22 @@ def get_race_info(race_id):
                 dist=dist, race_class=race_class, start_time=start_time)
 
 def get_top1_odds_and_horse(race_id):
-    url = f'https://race.netkeiba.com/race/shutuba.html?race_id={race_id}'
+    url = f'https://race.netkeiba.com/api/api_get_jra_odds.html?type=1&race_id={race_id}'
     try:
-        r = requests.get(url, headers=HEADERS, timeout=15)
-        html = r.content.decode('euc-jp', errors='replace')
-        # 単勝オッズを取得
-        pairs = re.findall(r'<td[^>]*class="[^"]*Odds[^"]*"[^>]*>([\d.]+)</td>', html)
-        if not pairs:
-            pairs = re.findall(r'<span[^>]*class="[^"]*odds[^"]*"[^>]*>([\d.]+)</span>', html)
-        if not pairs:
-            # shutuba_tableから馬番とオッズを取得
-            rows = re.findall(r'<tr[^>]*class="[^"]*HorseList[^"]*"[^>]*>.*?</tr>', html, re.DOTALL)
-            odds_map = {}
-            for i, row in enumerate(rows):
-                m = re.search(r'([\d]+\.[\d]+)', row)
-                if m:
-                    try: odds_map[str(i+1)] = float(m.group(1))
-                    except: pass
-        else:
-            odds_map = {str(i+1): float(v) for i, v in enumerate(pairs)}
+        r = requests.get(url, headers=HEADERS, timeout=10)
+        data = r.json()
+        if not isinstance(data, dict):
+            return None, None
+        odds_data = data.get('data', {})
+        if not isinstance(odds_data, dict):
+            print(f'    odds not ready (status={data.get("status")})')
+            return None, None
+        odds_raw = odds_data.get('odds', {})
+        odds_map = {}
+        for horse_num, v in odds_raw.items():
+            if isinstance(v, list) and v:
+                try: odds_map[horse_num] = float(v[0])
+                except: pass
         if odds_map:
             top1_num = min(odds_map, key=odds_map.get)
             return odds_map[top1_num], int(top1_num)
