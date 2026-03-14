@@ -73,18 +73,14 @@ def get_top1_odds_and_horse(race_id):
     url = f'https://race.netkeiba.com/api/api_get_jra_odds.html?type=1&race_id={race_id}'
     try:
         r = requests.get(url, headers=HEADERS, timeout=10)
-        data = r.json()
+        r.encoding = 'euc-jp'
+        text = r.text
+        import re as _re
+        pairs = _re.findall(r'"(\d+)":\["([\d.]+)"', text)
         odds_map = {}
-        if isinstance(data, dict):
-            odds_raw = data.get('data', {}).get('odds', {})
-        elif isinstance(data, list):
-            odds_raw = {str(i+1): [v] for i, v in enumerate(data) if v}
-        else:
-            odds_raw = {}
-        for horse_num, v in odds_raw.items():
-            if isinstance(v, list) and v:
-                try: odds_map[horse_num] = float(v[0])
-                except: pass
+        for horse_num, odds_val in pairs:
+            try: odds_map[horse_num] = float(odds_val)
+            except: pass
         if odds_map:
             top1_num = min(odds_map, key=odds_map.get)
             return odds_map[top1_num], int(top1_num)
