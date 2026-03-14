@@ -1,16 +1,16 @@
 {
-  "race_id": "202607010110",
+  "race_id": "202606020510",
   "race_num": 10,
-  "venue": "中京",
+  "venue": "中山",
   "surface": "芝",
   "dist": 2000,
-  "race_class": "2勝",
-  "start_time": "14:45",
-  "top1_odds": 3.2,
-  "top1_horse_num": 4,
+  "race_class": "1勝",
+  "start_time": "15:00",
+  "top1_odds": 3.5,
+  "top1_horse_num": 5,
   "conditions": [
     "テスト通知"
   ],
   "amount": 100,
-  "updated_at": "2026-03-14 14:28"
+  "updated_at": "2026-03-14 14:50"
 }
