@@ -53,7 +53,7 @@ def get_race_info(race_id):
     if re.search(r'<span class="Turf">', html): surface = '芝'
     elif re.search(r'<span class="Dirt">', html): surface = 'ダート'
     dist = 0
-    dm = re.search(r'<span>(\d{3,4})m</span>', html)
+    dm = re.search(r'(\d{3,4})m', html)
     if dm: dist = int(dm.group(1))
     race_class = ''
     for cls_key, keyword in CLASS_KEYWORDS:
@@ -75,7 +75,13 @@ def get_top1_odds_and_horse(race_id):
         r = requests.get(url, headers=HEADERS, timeout=10)
         data = r.json()
         odds_map = {}
-        for horse_num, v in data.get('data', {}).get('odds', {}).items():
+        if isinstance(data, dict):
+            odds_raw = data.get('data', {}).get('odds', {})
+        elif isinstance(data, list):
+            odds_raw = {str(i+1): [v] for i, v in enumerate(data) if v}
+        else:
+            odds_raw = {}
+        for horse_num, v in odds_raw.items():
             if isinstance(v, list) and v:
                 try: odds_map[horse_num] = float(v[0])
                 except: pass
