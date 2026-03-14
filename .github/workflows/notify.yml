@@ -18,4 +18,5 @@ jobs:
       - name: Run notify
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # ★追加
         run: python notify.py
