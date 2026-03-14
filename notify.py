@@ -58,8 +58,10 @@ def get_race_info(race_id):
     dm = re.search(r'(\d{3,4})m', html)
     if dm: dist = int(dm.group(1))
     race_class = ''
+    racedata2_m = re.search(r'RaceData02">(.*?)</div>', html, re.DOTALL)
+    racedata2 = racedata2_m.group(1) if racedata2_m else html
     for cls_key, keyword in CLASS_KEYWORDS:
-        if keyword in html:
+        if keyword in racedata2:
             race_class = cls_key
             break
     start_time = None
