@@ -6,8 +6,8 @@ DISCORD_WEBHOOK = os.environ.get('DISCORD_WEBHOOK', '')
 GH_TOKEN = os.environ.get('GH_TOKEN', '')
 GH_REPO = 'penmawashi8-ux/keiba-auto-betting'
 
-NOTIFY_MIN = 15
-NOTIFY_MAX = 30
+NOTIFY_MIN = 2
+NOTIFY_MAX = 15
 
 CONDITIONS = [
     dict(label='★★★ 阪神/ダート/1601-2000m/2勝/odds>=3.0',
