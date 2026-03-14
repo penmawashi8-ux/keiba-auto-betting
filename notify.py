@@ -70,17 +70,25 @@ def get_race_info(race_id):
                 dist=dist, race_class=race_class, start_time=start_time)
 
 def get_top1_odds_and_horse(race_id):
-    url = f'https://race.netkeiba.com/api/api_get_jra_odds.html?type=1&race_id={race_id}'
+    url = f'https://race.netkeiba.com/race/shutuba.html?race_id={race_id}'
     try:
-        r = requests.get(url, headers=HEADERS, timeout=10)
-        r.encoding = 'euc-jp'
-        text = r.text
-        import re as _re
-        pairs = _re.findall(r'"(\d+)":\["([\d.]+)"', text)
-        odds_map = {}
-        for horse_num, odds_val in pairs:
-            try: odds_map[horse_num] = float(odds_val)
-            except: pass
+        r = requests.get(url, headers=HEADERS, timeout=15)
+        html = r.content.decode('euc-jp', errors='replace')
+        # 単勝オッズを取得
+        pairs = re.findall(r'<td[^>]*class="[^"]*Odds[^"]*"[^>]*>([\d.]+)</td>', html)
+        if not pairs:
+            pairs = re.findall(r'<span[^>]*class="[^"]*odds[^"]*"[^>]*>([\d.]+)</span>', html)
+        if not pairs:
+            # shutuba_tableから馬番とオッズを取得
+            rows = re.findall(r'<tr[^>]*class="[^"]*HorseList[^"]*"[^>]*>.*?</tr>', html, re.DOTALL)
+            odds_map = {}
+            for i, row in enumerate(rows):
+                m = re.search(r'([\d]+\.[\d]+)', row)
+                if m:
+                    try: odds_map[str(i+1)] = float(m.group(1))
+                    except: pass
+        else:
+            odds_map = {str(i+1): float(v) for i, v in enumerate(pairs)}
         if odds_map:
             top1_num = min(odds_map, key=odds_map.get)
             return odds_map[top1_num], int(top1_num)
