@@ -2,8 +2,8 @@ name: notify
 
 on:
   schedule:
-    # 土日 JST 9:00-17:00 = UTC 0:00-8:00, 10分おき
-    - cron: '*/10 0-8 * * 0,6'
+    # 土日 JST 9:00-17:00 = UTC 0:00-8:00, 5分おき
+    - cron: '*/5 0-8 * * 0,6'
   workflow_dispatch:
 
 jobs:
@@ -18,5 +18,5 @@ jobs:
       - name: Run notify
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # ★追加
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: python notify.py
