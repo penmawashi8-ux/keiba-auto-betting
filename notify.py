@@ -74,9 +74,14 @@ def get_race_info(race_id):
                 dist=dist, race_class=race_class, start_time=start_time)
 
 def get_top1_odds_and_horse(race_id):
-    url = f'https://race.netkeiba.com/api/api_get_jra_odds.html?type=1&race_id={race_id}'
+    url = f'https://race.netkeiba.com/api/api_get_jra_odds.html?race_id={race_id}&type=1&action=update'
+    h = {
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120 Safari/537.36',
+        'Referer': 'https://race.netkeiba.com/',
+        'Accept': 'application/json,text/html,*/*',
+    }
     try:
-        r = requests.get(url, headers=HEADERS, timeout=10)
+        r = requests.get(url, headers=h, timeout=15)
         data = r.json()
         if not isinstance(data, dict):
             return None, None
@@ -84,12 +89,11 @@ def get_top1_odds_and_horse(race_id):
         if not isinstance(odds_data, dict):
             print(f'    odds not ready (status={data.get("status")})')
             return None, None
-        odds_raw = odds_data.get('odds', {})
+        odds_raw = odds_data.get('odds', {}).get('1', {})
         odds_map = {}
         for horse_num, v in odds_raw.items():
-            if isinstance(v, list) and v:
-                try: odds_map[horse_num] = float(v[0])
-                except: pass
+            try: odds_map[horse_num] = float(v[0])
+            except: pass
         if odds_map:
             top1_num = min(odds_map, key=odds_map.get)
             return odds_map[top1_num], int(top1_num)
