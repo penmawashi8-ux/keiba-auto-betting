@@ -1,14 +1,16 @@
 {
-  "race_id": "202509070107",
-  "race_num": 7,
-  "venue": "阪神",
-  "surface": "ダート",
-  "dist": 1800,
+  "race_id": "202607010110",
+  "race_num": 10,
+  "venue": "中京",
+  "surface": "芝",
+  "dist": 2000,
   "race_class": "2勝",
-  "start_time": "13:09",
-  "top1_odds": 3.9,
-  "top1_horse_num": 10,
-  "conditions": ["★★★ 阪神/ダート/1601-2000m/2勝/odds>=3.0"],
+  "start_time": "14:45",
+  "top1_odds": 3.2,
+  "top1_horse_num": 4,
+  "conditions": [
+    "テスト通知"
+  ],
   "amount": 100,
-  "updated_at": "2026-03-14 11:30"
+  "updated_at": "2026-03-14 14:28"
 }
