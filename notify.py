@@ -55,19 +55,22 @@ def get_race_info(race_id):
     raw_bytes = r.content
     m1 = raw_bytes.find(b'RaceData01">')
     m2 = raw_bytes.find(b'</div>', m1) if m1 >= 0 else -1
+    print(f'    m1={m1} m2={m2}')
     surface = ''
     if m1 >= 0 and m2 >= 0:
         section = raw_bytes[m1:m2]
-        # コメントアウト除去（バイト列）
+        print(f'    section hex: {section[20:60].hex()}')
         while b'<!--' in section:
             cs = section.find(b'<!--')
             ce = section.find(b'-->', cs)
             if ce < 0: break
             section = section[:cs] + section[ce+3:]
-        if b'\xc3\xcd' in section:  # 芝
+        print(f'    clean hex: {section[20:60].hex()}')
+        if b'\xc3\xcd' in section:
             surface = '芝'
-        elif b'\xc0\xef' in section:  # ダ
+        elif b'\xc0\xef' in section:
             surface = 'ダート'
+        print(f'    surface: {surface}')
 
     dist = 0
     dm = re.search(r'(\d{3,4})m', html)
