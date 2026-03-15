@@ -213,7 +213,7 @@ def main():
             msg += '━━━━━━━━━━━━\n'
             msg += '🎟 買い方: 1番人気単勝 100円\n'
             msg += '📲 **自動購入はこちら↓**\n'
-            msg += 'scriptable:///run?scriptName=umaca_auto'
+            msg += 'https://penmawashi8-ux.github.io/keiba-auto-betting/run.html'
             print(msg)
             send_discord(msg)
 
