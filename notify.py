@@ -52,8 +52,12 @@ def get_race_info(race_id):
     venue_code = race_id[4:6]
     venue = VENUE_MAP.get(venue_code, '?')
     surface = ''
-    if re.search(r'<span class="Turf">', html): surface = '芝'
-    elif re.search(r'<span class="Dirt">', html): surface = 'ダート'
+    racedata1_m = re.search(r'RaceData01">(.*?)</div>', html, re.DOTALL)
+    racedata1 = racedata1_m.group(1) if racedata1_m else ''
+    if re.search(r'[＼/] *芝', racedata1) or re.search(r'<span class="Turf">', racedata1):
+        surface = '芝'
+    elif re.search(r'ダd{3,4}m', racedata1) or re.search(r'<span class="Dirt">', racedata1):
+        surface = 'ダート'
     dist = 0
     dm = re.search(r'(\d{3,4})m', html)
     if dm: dist = int(dm.group(1))
