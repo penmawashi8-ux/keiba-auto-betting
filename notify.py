@@ -62,7 +62,9 @@ def get_race_info(race_id):
     else:
         dm = re.search(r'<span>(.)([0-9]{3,4})m</span>', racedata1_clean)
         if dm:
-            surface = 'ダート' if ord(dm.group(1)) > 127 else '芝'
+            ch = dm.group(1)
+            print(f'    surface_char: [{ch}] ord={ord(ch)} hex={hex(ord(ch))}')
+            surface = 'ダート' if ord(ch) > 127 else '芝'
 
     dist = 0
     dm = re.search(r'(\d{3,4})m', html)
