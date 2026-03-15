@@ -51,26 +51,22 @@ def get_race_info(race_id):
     html = r.content.decode('euc-jp', errors='replace')
     venue_code = race_id[4:6]
     venue = VENUE_MAP.get(venue_code, '?')
-    # RaceData01のバイト範囲内で馬場判定
+    # RaceData01のバイト範囲内で馬場判定（EUC-JP: 芝=0xbcc7, ダ=0xa5c0）
     raw_bytes = r.content
     m1 = raw_bytes.find(b'RaceData01">')
     m2 = raw_bytes.find(b'</div>', m1) if m1 >= 0 else -1
-    print(f'    m1={m1} m2={m2}')
     surface = ''
     if m1 >= 0 and m2 >= 0:
         section = raw_bytes[m1:m2]
-        print(f'    section hex: {section[20:60].hex()}')
         while b'<!--' in section:
             cs = section.find(b'<!--')
             ce = section.find(b'-->', cs)
             if ce < 0: break
             section = section[:cs] + section[ce+3:]
-        print(f'    clean hex: {section[20:60].hex()}')
-        if b'\xc3\xcd' in section:
+        if b'\xbc\xc7' in section:
             surface = '芝'
-        elif b'\xc0\xef' in section:
+        elif b'\xa5\xc0' in section:
             surface = 'ダート'
-        print(f'    surface: {surface}')
 
     dist = 0
     dm = re.search(r'(\d{3,4})m', html)
