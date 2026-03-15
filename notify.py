@@ -63,15 +63,17 @@ def get_race_info(race_id):
             ce = section.find(b'-->', cs)
             if ce < 0: break
             section = section[:cs] + section[ce+3:]
-        # <span> の直後2バイトで判定
         sp = section.find(b'<span> ')
         if sp >= 0:
             two = section[sp+7:sp+9]
-            print(f'    two bytes: {two.hex()}')
             if two == b'\xbc\xc7':
                 surface = '芝'
-            else:
+            elif two == b'\xa5\xc0':
                 surface = 'ダート'
+            elif two == b'\xbe\xe3':
+                surface = '障害'
+            else:
+                surface = ''
 
     dist = 0
     dm = re.search(r'(\d{3,4})m', html)
