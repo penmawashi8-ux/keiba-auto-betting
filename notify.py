@@ -51,7 +51,7 @@ def get_race_info(race_id):
     html = r.content.decode('euc-jp', errors='replace')
     venue_code = race_id[4:6]
     venue = VENUE_MAP.get(venue_code, '?')
-    # RaceData01のバイト範囲内で馬場判定（EUC-JP: 芝=0xbcc7, ダ=0xa5c0）
+    # 距離の直前バイトで馬場判定
     raw_bytes = r.content
     m1 = raw_bytes.find(b'RaceData01">')
     m2 = raw_bytes.find(b'</div>', m1) if m1 >= 0 else -1
@@ -63,10 +63,15 @@ def get_race_info(race_id):
             ce = section.find(b'-->', cs)
             if ce < 0: break
             section = section[:cs] + section[ce+3:]
-        if b'\xbc\xc7' in section:
-            surface = '芝'
-        elif b'\xa5\xc0' in section:
-            surface = 'ダート'
+        # <span> の直後2バイトで判定
+        sp = section.find(b'<span> ')
+        if sp >= 0:
+            two = section[sp+7:sp+9]
+            print(f'    two bytes: {two.hex()}')
+            if two == b'\xbc\xc7':
+                surface = '芝'
+            else:
+                surface = 'ダート'
 
     dist = 0
     dm = re.search(r'(\d{3,4})m', html)
