@@ -51,20 +51,14 @@ def get_race_info(race_id):
     html = r.content.decode('euc-jp', errors='replace')
     venue_code = race_id[4:6]
     venue = VENUE_MAP.get(venue_code, '?')
-    surface = ''
-    racedata1_m = re.search(r'RaceData01">(.*?)</div>', html, re.DOTALL)
-    racedata1 = racedata1_m.group(1) if racedata1_m else ''
-    racedata1_clean = re.sub(r'<!--.*?-->', '', racedata1, flags=re.DOTALL)
-    if re.search(r'<span class="Turf">', racedata1_clean):
+    # バイト列で馬場判定（EUC-JP: 芝=0xc3cd, ダ=0xc0ef）
+    raw_bytes = r.content
+    if b'\xc3\xcd' in raw_bytes:  # 芝
         surface = '芝'
-    elif re.search(r'<span class="Dirt">', racedata1_clean):
+    elif b'\xc0\xef' in raw_bytes:  # ダ
         surface = 'ダート'
     else:
-        dm = re.search(r'<span>(.)([0-9]{3,4})m</span>', racedata1_clean)
-        if dm:
-            ch = dm.group(1)
-            print(f'    surface_char: [{ch}] ord={ord(ch)} hex={hex(ord(ch))}')
-            surface = 'ダート' if ord(ch) > 127 else '芝'
+        surface = ''
 
     dist = 0
     dm = re.search(r'(\d{3,4})m', html)
